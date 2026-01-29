@@ -361,6 +361,10 @@ input:not(:disabled):focus::after {
   <span style="color: #ff66ff; font-size: 12px;">Collapse Count:</span>
   <span id="collapseCount" style="color: #ffcc00; font-size: 12px;">0</span>
 </div>
+<div class="row">
+  <span style="color: #ff66ff; font-size: 12px;">Copy Count:</span>
+  <span id="copyCount" style="color: #ffcc00; font-size: 12px;">0</span>
+</div>
 </div>
 
 <script>
@@ -489,6 +493,7 @@ document.addEventListener('keydown', (e) => {
 ====================================================== */
 let currentSTT = null;
 let collapseCounter = 0;
+let copyCounter = 0;
 
 /* ======================================================
    ELEMENTS
@@ -502,6 +507,7 @@ const IDX_NEXT = document.getElementById("idx5");
 const entropyView = document.getElementById("entropyView");
 const energyStatus = document.getElementById("energyStatus");
 const collapseCount = document.getElementById("collapseCount");
+const copyCount = document.getElementById("copyCount");
 
 /* ======================================================
    AUTO FOCUS
@@ -542,6 +548,17 @@ let energy = [...Array(3)].map(() =>
     [...Array(5)].map(() => 0)
   )
 );
+
+function rotateRotors(){
+  for(let r=0;r<3;r++){
+    // Xoay rotor: mỗi hàng dịch xuống 1, hàng cuối lên đầu
+    let temp = rotors[r][4];
+    for(let i=4;i>0;i--){
+      rotors[r][i] = rotors[r][i-1];
+    }
+    rotors[r][0] = temp;
+  }
+}
 
 function process(bits){
   let state=[...bits];
@@ -646,10 +663,26 @@ IN[5].addEventListener("input",()=>{
         CPY[i].value = IN[i].value;
         IN[i].value  = "";
       }
+      
+      // Tăng số lần copy
+      copyCounter++;
+      copyCount.textContent = copyCounter;
 
       const bits = CPY.map(x=>Number(x.value));
       const out  = process(bits);
+      
+      console.log("Trước khi đảo:", out);
+      
+      // Đảo bit số 2 và 4 (index 1 và 3) trước khi hiển thị
+      out[1] ^= 1; // Đảo bit thứ 2
+      out[3] ^= 1; // Đảo bit thứ 4
+      
+      console.log("Sau khi đảo:", out);
+      
       out.forEach((v,i)=>OUT[i].value=v);
+
+      // Xoay rotor sau khi xử lý xong
+      rotateRotors();
 
       accumulateEnergy(out);
 
