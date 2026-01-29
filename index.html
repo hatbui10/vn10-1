@@ -278,6 +278,614 @@ input:not(:disabled):focus::after {
   transform: translate(-50%, -50%) scale(2);
   opacity: 0;
 }
+
+/* High-Level Security Icons Styles */
+.security-icons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.security-icons-row {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  align-items: center;
+}
+
+.security-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.main-shield {
+  animation: mainShieldPulse 3s ease-in-out infinite;
+}
+
+.main-shield svg {
+  filter: drop-shadow(0 0 20px rgba(0,255,136,0.8)) drop-shadow(0 0 40px rgba(0,136,255,0.6));
+  transition: all 0.4s ease;
+}
+
+.main-shield:hover svg {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 0 30px rgba(0,255,136,1)) drop-shadow(0 0 60px rgba(0,136,255,0.8));
+}
+
+.lock-icon svg {
+  filter: drop-shadow(0 0 15px rgba(255,0,255,0.7)) drop-shadow(0 0 25px rgba(0,255,255,0.5));
+  animation: lockRotate 4s ease-in-out infinite;
+}
+
+.lock-icon:hover svg {
+  transform: scale(1.2) rotate(-10deg);
+  filter: drop-shadow(0 0 25px rgba(255,0,255,1)) drop-shadow(0 0 40px rgba(0,255,255,0.8));
+}
+
+.key-icon svg {
+  filter: drop-shadow(0 0 15px rgba(255,215,0,0.7)) drop-shadow(0 0 25px rgba(255,136,0,0.5));
+  animation: keyShine 3s ease-in-out infinite;
+}
+
+.key-icon:hover svg {
+  transform: scale(1.2) rotate(15deg);
+  filter: drop-shadow(0 0 25px rgba(255,215,0,1)) drop-shadow(0 0 40px rgba(255,136,0,0.8));
+}
+
+.fingerprint-icon svg {
+  filter: drop-shadow(0 0 15px rgba(255,0,128,0.7)) drop-shadow(0 0 25px rgba(128,0,255,0.5));
+  animation: fingerprintScan 2.5s ease-in-out infinite;
+}
+
+.fingerprint-icon:hover svg {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 25px rgba(255,0,128,1)) drop-shadow(0 0 40px rgba(128,0,255,0.8));
+}
+
+@keyframes mainShieldPulse {
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05);
+  }
+}
+
+@keyframes lockRotate {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes keyShine {
+  0%, 100% { 
+    filter: drop-shadow(0 0 15px rgba(255,215,0,0.7)) drop-shadow(0 0 25px rgba(255,136,0,0.5));
+  }
+  50% { 
+    filter: drop-shadow(0 0 25px rgba(255,215,0,1)) drop-shadow(0 0 40px rgba(255,136,0,0.8));
+  }
+}
+
+@keyframes fingerprintScan {
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.1);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <!-- High-Level Security Icons -->
+  <div class="security-icons-container">
+    <div class="security-icon main-shield">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" stroke="url(#shield-gradient)" stroke-width="2" fill="url(#shield-fill)"/>
+        <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+          <linearGradient id="shield-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#00d4ff;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0088ff;stop-opacity:1" />
+          </linearGradient>
+          <linearGradient id="shield-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:rgba(0,255,136,0.3);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgba(0,136,255,0.2);stop-opacity:1" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    
+    <div class="security-icons-row">
+      <div class="security-icon lock-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="url(#lock-gradient)" stroke-width="2" fill="url(#lock-fill)"/>
+          <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="url(#lock-gradient)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="16" r="1" fill="white"/>
+          <defs>
+            <linearGradient id="lock-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#00ffff;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="lock-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:rgba(255,0,255,0.2);stop-opacity:1" />
+              <stop offset="100%" style="stop-color:rgba(0,255,255,0.1);stop-opacity:1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      
+      <div class="security-icon key-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6" stroke="url(#key-gradient)" stroke-width="2" fill="none"/>
+          <path d="M12 12L19 19M19 19V16M19 19H16" stroke="url(#key-gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="8" cy="8" r="2" fill="url(#key-gradient)"/>
+          <defs>
+            <linearGradient id="key-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#ff8800;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      
+      <div class="security-icon fingerprint-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="url(#finger-gradient)" stroke-width="2" fill="none"/>
+          <path d="M12 6C9.79 6 8 7.79 8 10C8 12.21 9.79 14 12 14C14.21 14 16 12.21 16 10C16 7.79 14.21 6 12 6Z" stroke="url(#finger-gradient)" stroke-width="1.5" fill="none"/>
+          <path d="M12 14V18" stroke="url(#finger-gradient)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 10C8 11.1 8.9 12 10 12" stroke="url(#finger-gradient)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M16 10C16 11.1 15.1 12 14 12" stroke="url(#finger-gradient)" stroke-width="1.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="finger-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#8000ff;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <h3>Hệ thống mã hóa cấp độ tối cao</h3>
+
+  <div class="input-section">
+    <div class="section-title">Nhập dữ liệu:</div>
+    <div class="row">
+      <input id="in0" disabled>
+      <input id="in1" disabled>
+      <input id="in2" disabled>
+      <input id="in3" disabled>
+      <input id="in4" disabled>
+      <input id="in5" maxlength="1" autofocus>
+    </div>
+  </div>
+
+  <div class="output-section">
+    <div class="section-title">Kết quả mã hóa:</div>
+    <div class="row">
+      <input id="out0" disabled>
+      <input id="out1" disabled>
+      <input id="out2" disabled>
+      <input id="out3" disabled>
+      <input id="out4" disabled>
+    </div>
+  </div>
+
+  <div class="row">
+    <span class="label">Entropy:</span>
+    <span id="entropyView"></span>
+  </div>
+</div>
+
+<script>
+const IN = [...Array(6)].map((_, i) => document.getElementById("in" + i));
+const OUT = [...Array(5)].map((_, i) => document.getElementById("out" + i));
+const entropyView = document.getElementById("entropyView");
+
+/* ========= ROTOR MATRIX + ENERGY ========= */
+
+// 3 rotor, mỗi rotor là ma trận 5x5
+let rotors = [...Array(3)].map(() =>
+  [...Array(5)].map(() =>
+    [...Array(5)].map(() => Math.random() < 0.5 ? 1 : 0)
+  )
+);
+
+// năng lượng tích lũy cho từng mask
+let energy = [...Array(3)].map(() =>
+  [...Array(5)].map(() =>
+    [...Array(5)].map(() => 0)
+  )
+);
+
+let prevOutput = [0,0,0,0,0];
+
+const xor = (a,b) => a ^ b;
+
+/* ========= CORE PROCESS ========= */
+
+// matrix rotor + cross influence
+function process(bits) {
+  let state = [...bits];
+
+  for (let r = 0; r < 3; r++) {
+    let next = Array(5).fill(0);
+    for (let i = 0; i < 5; i++) {
+      let v = 0;
+      for (let j = 0; j < 5; j++) {
+        if (rotors[r][i][j]) v ^= state[j];
+      }
+      // ảnh hưởng chéo hàng xóm
+      v ^= state[(i+1)%5];
+      v ^= state[(i+4)%5];
+      next[i] = v;
+    }
+    state = next;
+  }
+  return state;
+}
+
+/* ========= LEARNING ========= */
+
+function accumulateEnergy(output) {
+  for (let r = 0; r < 3; r++) {
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 5; j++) {
+        energy[r][i][j] += output[i] ? 1 : -1;
+        if (Math.abs(energy[r][i][j]) > 3) {
+          rotors[r][i][j] ^= 1;   // học → lật mask
+          energy[r][i][j] = 0;
+        }
+      }
+    }
+  }
+}
+
+/* ========= ENTROPY + COLLAPSE ========= */
+
+function entropy(bits) {
+  let p = bits.reduce((a,b)=>a+b,0) / bits.length;
+  if (p === 0 || p === 1) return 0;
+  return -(p*Math.log2(p) + (1-p)*Math.log2(1-p));
+}
+
+function collapse(ent) {
+  if (ent > 0.9) {
+    // collapse mạnh: triệt nhiễu
+    for (let r = 0; r < 3; r++) {
+      for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+          if (Math.random() < 0.3) rotors[r][i][j] = 0;
+        }
+      }
+    }
+  }
+}
+
+/* ========= INPUT HANDLER ========= */
+
+IN[5].addEventListener("input", () => {
+  const v = IN[5].value;
+  if (v !== "0" && v !== "1") {
+    IN[5].value = "";
+    return;
+  }
+
+  for (let i = 0; i < 5; i++) IN[i].value = IN[i+1].value;
+  IN[4].value = v;
+  IN[5].value = "";
+
+  const bits = IN.slice(0,5).map(b => Number(b.value || 0));
+  const out = process(bits);
+
+  out.forEach((v,i) => OUT[i].value = v);
+
+  accumulateEnergy(out);
+
+  const e = entropy(out);
+  entropyView.textContent = e.toFixed(3);
+  collapse(e);
+
+  prevOutput = out;
+});
+</script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Adaptive Quantum Rotor</title>
+<style>
+  body {
+  background: radial-gradient(circle at top, #111 0%, #050505 60%, #000 100%);
+  color: #00ffb0;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* animated background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(0,255,176,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(0,255,213,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(102,255,208,0.05) 0%, transparent 50%);
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+/* input chung */
+input {
+  width: 42px;
+  height: 42px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(139,0,0,0.9) 0%, rgba(180,0,0,0.8) 100%);
+  color: yellow;
+  border: 2px solid rgba(255,100,100,0.6);
+  margin: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 
+    0 0 10px rgba(255,0,0,0.3),
+    inset 0 0 10px rgba(255,0,0,0.1);
+}
+
+/* input bị disabled nhưng KHÔNG mờ */
+input:disabled {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(100,0,0,0.9) 0%, rgba(120,0,0,0.8) 100%);
+  color: white;
+  border-color: rgba(255,100,100,0.6);
+  box-shadow: 
+    0 0 8px rgba(255,0,0,0.2),
+    inset 0 0 8px rgba(255,0,0,0.05);
+}
+
+/* hover cho mấy ô hiển thị */
+input:disabled:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 4px 15px rgba(255,0,0,0.4),
+    0 0 20px rgba(255,0,0,0.3),
+    inset 0 0 15px rgba(255,0,0,0.1);
+  border-color: rgba(255,100,100,0.8);
+}
+
+/* ô nhập chính (in5) */
+input:not(:disabled) {
+  border-color: rgba(255,150,150,0.8);
+  background: linear-gradient(135deg, rgba(160,0,0,0.9) 0%, rgba(200,0,0,0.8) 100%);
+  box-shadow:
+    0 0 15px rgba(255,0,0,0.8),
+    0 0 30px rgba(255,0,0,0.5),
+    0 0 45px rgba(255,0,0,0.3),
+    inset 0 0 20px rgba(255,0,0,0.2);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 15px rgba(255,0,0,0.8), 0 0 30px rgba(255,0,0,0.5), 0 0 45px rgba(255,0,0,0.3), inset 0 0 20px rgba(255,0,0,0.2); }
+  to { box-shadow: 0 0 20px rgba(255,0,0,1), 0 0 40px rgba(255,0,0,0.7), 0 0 60px rgba(255,0,0,0.5), inset 0 0 25px rgba(255,0,0,0.3); }
+}
+
+/* khi focus */
+input:focus {
+  outline: none;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow:
+    0 0 25px rgba(255,0,0,1),
+    0 0 50px rgba(255,0,0,0.8),
+    0 0 75px rgba(255,0,0,0.6),
+    inset 0 0 30px rgba(255,0,0,0.4);
+  border-color: rgba(255,200,200,0.9);
+  background: linear-gradient(135deg, rgba(180,0,0,0.9) 0%, rgba(220,0,0,0.8) 100%);
+}
+
+/* main container */
+.main-container {
+  max-width: 600px;
+  margin: 50px auto;
+  background: linear-gradient(135deg, rgba(20,0,30,0.9) 0%, rgba(30,0,45,0.8) 100%);
+  border: 2px solid rgba(147,51,234,0.6);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 
+    0 0 50px rgba(147,51,234,0.4),
+    0 0 100px rgba(147,51,234,0.2),
+    inset 0 0 30px rgba(147,51,234,0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.main-container::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #9333ea, #a855f7, #c084fc, #9333ea);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+/* input/output sections */
+.input-section, .output-section {
+  background: linear-gradient(135deg, rgba(10,0,20,0.7) 0%, rgba(20,0,30,0.5) 100%);
+  border: 1px solid rgba(147,51,234,0.4);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 0 20px rgba(147,51,234,0.2),
+    inset 0 0 15px rgba(147,51,234,0.05);
+  transition: all 0.3s ease;
+}
+
+.input-section:hover, .output-section:hover {
+  box-shadow: 
+    0 0 30px rgba(147,51,234,0.4),
+    inset 0 0 20px rgba(147,51,234,0.1);
+  transform: translateY(-2px);
+}
+
+.section-title {
+  color: #c084fc;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(192,132,252,0.8);
+  margin-bottom: 15px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* layout */
+.row {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.label {
+  display: inline-block;
+  width: 160px;
+  color: #c084fc;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(192,132,252,0.6);
+  letter-spacing: 1px;
+}
+
+/* entropy */
+#entropyView {
+  padding: 8px 16px;
+  color: #ffcc66;
+  text-shadow: 0 0 8px rgba(255,200,100,0.8);
+  font-weight: bold;
+  font-size: 16px;
+  background: linear-gradient(135deg, rgba(255,200,100,0.1) 0%, rgba(255,200,100,0.05) 100%);
+  border: 1px solid rgba(255,200,100,0.3);
+  border-radius: 20px;
+  display: inline-block;
+  animation: entropyGlow 3s ease-in-out infinite;
+}
+
+@keyframes entropyGlow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(255,200,100,0.4);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(255,200,100,0.6);
+    transform: scale(1.02);
+  }
+}
+/* security icon */
+.security-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: securityPulse 3s ease-in-out infinite;
+}
+
+.security-icon svg {
+  filter: drop-shadow(0 0 15px rgba(147,51,234,0.6));
+  transition: all 0.3s ease;
+}
+
+.security-icon:hover svg {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 25px rgba(147,51,234,0.8));
+}
+
+@keyframes securityPulse {
+  0%, 100% { 
+    opacity: 0.7; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05);
+  }
+}
+
+/* heading */
+h3 {
+  color: #c084fc;
+  text-shadow: 
+    0 0 20px rgba(192,132,252,0.8),
+    0 0 40px rgba(192,132,252,0.5);
+  font-size: 24px;
+  margin-bottom: 30px;
+  text-align: center;
+  letter-spacing: 2px;
+  animation: titlePulse 4s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* container */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ripple effect for inputs */
+input::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.6s ease-out;
+}
+
+input:not(:disabled):focus::after {
+  transform: translate(-50%, -50%) scale(2);
+  opacity: 0;
+}
 </style>
 </head>
 <body>
@@ -429,4 +1037,5 @@ IN[5].addEventListener("input", () => {
 
 </body>
 </html>
+
 
