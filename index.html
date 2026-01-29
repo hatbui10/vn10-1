@@ -364,41 +364,73 @@ input:not(:disabled):focus::after {
 </div>
 
 <script>
-/* ===== STATE ===== */
-let currentSTT = null;
-let collapseCounter = 0;  // Đếm số lần collapse
+/* ======================================================
+   AUDIO ENGINE
+====================================================== */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioCtx();
 
-/* ===== ELEMENTS ===== */
+function tone(freq = 440, dur = 0.05, vol = 0.08, type = "square") {
+  if (audioCtx.state === "suspended") audioCtx.resume();
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + dur);
+}
+
+/* ======================================================
+   STATE
+====================================================== */
+let currentSTT = null;
+let collapseCounter = 0;
+
+/* ======================================================
+   ELEMENTS
+====================================================== */
 const IDX = [...Array(5)].map((_,i)=>document.getElementById("idx"+i));
 const IN  = [...Array(6)].map((_,i)=>document.getElementById("in"+i));
 const CPY = [...Array(5)].map((_,i)=>document.getElementById("cpy"+i));
 const OUT = [...Array(5)].map((_,i)=>document.getElementById("out"+i));
+
 const IDX_NEXT = document.getElementById("idx5");
 const entropyView = document.getElementById("entropyView");
 const energyStatus = document.getElementById("energyStatus");
 const collapseCount = document.getElementById("collapseCount");
 
-/* ===== AUTO FOCUS ON LOAD ===== */
+/* ======================================================
+   AUTO FOCUS
+====================================================== */
 window.onload = () => IDX_NEXT.focus();
 
-/* ===== STT INPUT ===== */
+/* ======================================================
+   STT INPUT
+====================================================== */
 IDX_NEXT.addEventListener("input", () => {
-  // chỉ cho số
   IDX_NEXT.value = IDX_NEXT.value.replace(/\D/g, "");
 
-  // chưa đủ 3 chữ số thì đứng yên
   if (IDX_NEXT.value.length < 3) return;
 
-  // đủ 3 số thì xử lý
   currentSTT = parseInt(IDX_NEXT.value, 10);
-
-  // xóa ô STT nhập
   IDX_NEXT.value = "";
 
-  // focus sang ô nhập bit
+  tone(220, 0.07);       // STT locked
   IN[5].focus();
 });
-/* ===== ROTOR + ENERGY ===== */
+
+/* ======================================================
+   ROTOR + ENERGY
+====================================================== */
 let rotors = [...Array(3)].map(() =>
   [...Array(5)].map(() =>
     [...Array(5)].map(() => Math.random() < 0.5 ? 1 : 0)
@@ -429,11 +461,11 @@ function process(bits){
   return state;
 }
 
-function accumulateEnergy(output){
+function accumulateEnergy(out){
   for(let r=0;r<3;r++){
     for(let i=0;i<5;i++){
       for(let j=0;j<5;j++){
-        energy[r][i][j] += output[i] ? 1 : -1;
+        energy[r][i][j] += out[i] ? 1 : -1;
         if(Math.abs(energy[r][i][j]) > 3){
           rotors[r][i][j] ^= 1;
           energy[r][i][j] = 0;
@@ -449,61 +481,66 @@ function entropy(bits){
   return -(p*Math.log2(p)+(1-p)*Math.log2(1-p));
 }
 
-/* ===== ENTROPY COLLAPSE ===== */
+/* ======================================================
+   COLLAPSE
+====================================================== */
 function collapse(ent){
   if(ent > 0.9){
-    // Collapse mạnh: triệt nhiễu khi entropy quá cao
-    for(let r=0; r<3; r++){
-      for(let i=0; i<5; i++){
-        for(let j=0; j<5; j++){
-          if(Math.random() < 0.3) rotors[r][i][j] = 0;  // Reset 30% masks
-        }
-      }
-    }
-    // Reset energy sau collapse
+    for(let r=0;r<3;r++)
+      for(let i=0;i<5;i++)
+        for(let j=0;j<5;j++)
+          if(Math.random()<0.3) rotors[r][i][j]=0;
+
     energy = [...Array(3)].map(() =>
       [...Array(5)].map(() =>
         [...Array(5)].map(() => 0)
       )
     );
-    
-    // Cập nhật status
+
     collapseCounter++;
     collapseCount.textContent = collapseCounter;
-    energyStatus.textContent = "COLLAPSED!";
-    energyStatus.style.color = "#ff0000";
-    
-    setTimeout(() => {
-      energyStatus.textContent = "Low";
-      energyStatus.style.color = "#ffcc00";
-    }, 2000);
+    energyStatus.textContent = "COLLAPSED";
+    energyStatus.style.color = "#ff4444";
+
+    // collapse sound
+    for(let i=0;i<5;i++){
+      setTimeout(()=>tone(900+i*120,0.05,0.07,"sawtooth"), i*50);
+    }
+
+    setTimeout(()=>{
+      energyStatus.textContent="Low";
+      energyStatus.style.color="#00ff00";
+    },1500);
   }
 }
 
-/* ===== BIT INPUT ===== */
+/* ======================================================
+   BIT INPUT
+====================================================== */
 IN[5].addEventListener("input",()=>{
   const v = IN[5].value;
-  if(v!=="0" && v!=="1"){
-    IN[5].value="";
-    return;
-  }
+  if(v!=="0" && v!=="1"){ IN[5].value=""; return; }
   if(currentSTT===null) return;
+
+  tone(v==="0"?600:800,0.04);
 
   currentSTT++;
 
-  /* shift left STT + INPUT */
   for(let i=0;i<4;i++){
     IDX[i].value = IDX[i+1].value;
     IN[i].value  = IN[i+1].value;
   }
 
-  IDX[4].value = currentSTT;
+  IDX[4].value = String(currentSTT).padStart(3,"0");
   IN[4].value  = v;
   IN[5].value  = "";
 
-  /* đủ 5 bit thì xử lý */
+  tone(400,0.03); // shift sound
+
   if(IN.slice(0,5).every(x=>x.value!=="")){
     setTimeout(()=>{
+      tone(300,0.08); // buffer full
+
       for(let i=0;i<5;i++){
         CPY[i].value = IN[i].value;
         IN[i].value  = "";
@@ -517,35 +554,33 @@ IN[5].addEventListener("input",()=>{
 
       const ent = entropy(out);
       entropyView.textContent = ent.toFixed(3);
-      
-      // Cập nhật energy level
-      let totalEnergy = 0;
-      for(let r=0; r<3; r++){
-        for(let i=0; i<5; i++){
-          for(let j=0; j<5; j++){
-            totalEnergy += Math.abs(energy[r][i][j]);
-          }
-        }
-      }
-      
-      if(totalEnergy > 50){
-        energyStatus.textContent = "High";
-        energyStatus.style.color = "#ff6600";
-      } else if(totalEnergy > 20){
-        energyStatus.textContent = "Medium";
-        energyStatus.style.color = "#ffcc00";
-      } else {
-        energyStatus.textContent = "Low";
-        energyStatus.style.color = "#00ff00";
-      }
-      
-      collapse(ent);  // Thêm collapse theo entropy
+      tone(300+ent*800,0.06,0.06,"triangle");
 
-      /* clear STT cũ */
+      let totalEnergy=0;
+      for(let r=0;r<3;r++)
+        for(let i=0;i<5;i++)
+          for(let j=0;j<5;j++)
+            totalEnergy+=Math.abs(energy[r][i][j]);
+
+      if(totalEnergy>50){
+        energyStatus.textContent="High";
+        energyStatus.style.color="#ff6600";
+      }else if(totalEnergy>20){
+        energyStatus.textContent="Medium";
+        energyStatus.style.color="#ffcc00";
+      }else{
+        energyStatus.textContent="Low";
+        energyStatus.style.color="#00ff00";
+      }
+
+      collapse(ent);
+
       for(let i=0;i<5;i++) IDX[i].value="";
+      currentSTT=null;
 
-      currentSTT = null;
+      tone(180,0.1); // cycle reset
       IDX_NEXT.focus();
+
     },1000);
   }
 });
