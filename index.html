@@ -637,7 +637,8 @@ IN[5].addEventListener("input",()=>{
 
   tone(400,0.03); // shift sound
 
-  if(IN.slice(0,5).every(x=>x.value!=="")){
+  let filledCount = IN.slice(0,5).filter(x=>x.value!=="").length;
+  if(filledCount === 5){
     setTimeout(()=>{
       tone(300,0.08); // buffer full
 
