@@ -1,371 +1,403 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Máy Tính Nhị Phân</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<title>Adaptive Quantum Rotor</title>
+<style>
+  body {
+  background: radial-gradient(circle at top, #111 0%, #050505 60%, #000 100%);
+  color: #00ffb0;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
+  overflow-x: hidden;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background-image: url("https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/474095rem/hinh-anh-mat-me-mua-he_044800626.jpg");
-            overflow: hidden;
-        }
+/* animated background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(0,255,176,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(0,255,213,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(102,255,208,0.05) 0%, transparent 50%);
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 219, 98, 0.2) 0%, transparent 50%);
-            animation: floatingGradient 15s ease-in-out infinite;
-        }
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
 
-        @keyframes floatingGradient {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(-20px, -20px) rotate(1deg); }
-            66% { transform: translate(20px, -10px) rotate(-1deg); }
-        }
+/* input chung */
+input {
+  width: 42px;
+  height: 42px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(139,0,0,0.9) 0%, rgba(180,0,0,0.8) 100%);
+  color: white;
+  border: 2px solid rgba(255,100,100,0.6);
+  margin: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 
+    0 0 10px rgba(255,0,0,0.3),
+    inset 0 0 10px rgba(255,0,0,0.1);
+}
 
-        .container {
-            text-align: center;
-            background: red;
-            backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-            position: relative;
-            z-index: 1;
-            animation: slideUp 0.6s ease-out;
-        }
+/* input bị disabled nhưng KHÔNG mờ */
+input:disabled {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(100,0,0,0.9) 0%, rgba(120,0,0,0.8) 100%);
+  color: white;
+  border-color: rgba(255,100,100,0.6);
+  box-shadow: 
+    0 0 8px rgba(255,0,0,0.2),
+    inset 0 0 8px rgba(255,0,0,0.05);
+}
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+/* hover cho mấy ô hiển thị */
+input:disabled:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 4px 15px rgba(255,0,0,0.4),
+    0 0 20px rgba(255,0,0,0.3),
+    inset 0 0 15px rgba(255,0,0,0.1);
+  border-color: rgba(255,100,100,0.8);
+}
 
-        h1 {
-            color: #fff;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: 700;
-            
-        }
+/* ô nhập chính (in5) */
+input:not(:disabled) {
+  border-color: rgba(255,150,150,0.8);
+  background: linear-gradient(135deg, rgba(160,0,0,0.9) 0%, rgba(200,0,0,0.8) 100%);
+  box-shadow:
+    0 0 15px rgba(255,0,0,0.8),
+    0 0 30px rgba(255,0,0,0.5),
+    0 0 45px rgba(255,0,0,0.3),
+    inset 0 0 20px rgba(255,0,0,0.2);
+  animation: glow 2s ease-in-out infinite alternate;
+}
 
-        .result-box {
-            width: 80px;
-            height: 80px;
-            border: 3px solid transparent;
-            margin: 0 auto 30px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
-        }
+@keyframes glow {
+  from { box-shadow: 0 0 15px rgba(255,0,0,0.8), 0 0 30px rgba(255,0,0,0.5), 0 0 45px rgba(255,0,0,0.3), inset 0 0 20px rgba(255,0,0,0.2); }
+  to { box-shadow: 0 0 20px rgba(255,0,0,1), 0 0 40px rgba(255,0,0,0.7), 0 0 60px rgba(255,0,0,0.5), inset 0 0 25px rgba(255,0,0,0.3); }
+}
 
-        .result-box::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #ff0844, #ffb700, #00d4ff, #ff0844);
-            border-radius: 15px;
-            z-index: -1;
-            animation: borderAnimation 3s linear infinite;
-            background-size: 400% 400%;
-        }
+/* khi focus */
+input:focus {
+  outline: none;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow:
+    0 0 25px rgba(255,0,0,1),
+    0 0 50px rgba(255,0,0,0.8),
+    0 0 75px rgba(255,0,0,0.6),
+    inset 0 0 30px rgba(255,0,0,0.4);
+  border-color: rgba(255,200,200,0.9);
+  background: linear-gradient(135deg, rgba(180,0,0,0.9) 0%, rgba(220,0,0,0.8) 100%);
+}
 
-        @keyframes borderAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+/* main container */
+.main-container {
+  max-width: 600px;
+  margin: 50px auto;
+  background: linear-gradient(135deg, rgba(20,0,30,0.9) 0%, rgba(30,0,45,0.8) 100%);
+  border: 2px solid rgba(147,51,234,0.6);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 
+    0 0 50px rgba(147,51,234,0.4),
+    0 0 100px rgba(147,51,234,0.2),
+    inset 0 0 30px rgba(147,51,234,0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
 
-        .result-box:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
-        }
+.main-container::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #9333ea, #a855f7, #c084fc, #9333ea);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.6;
+}
 
-        .input-row {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
+/* input/output sections */
+.input-section, .output-section {
+  background: linear-gradient(135deg, rgba(10,0,20,0.7) 0%, rgba(20,0,30,0.5) 100%);
+  border: 1px solid rgba(147,51,234,0.4);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 0 20px rgba(147,51,234,0.2),
+    inset 0 0 15px rgba(147,51,234,0.05);
+  transition: all 0.3s ease;
+}
 
-        .input-box {
-            width: 70px;
-            height: 70px;
-            border: 2px solid #e0e0e0;
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+.input-section:hover, .output-section:hover {
+  box-shadow: 
+    0 0 30px rgba(147,51,234,0.4),
+    inset 0 0 20px rgba(147,51,234,0.1);
+  transform: translateY(-2px);
+}
 
-        .input-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s ease;
-        }
+.section-title {
+  color: #c084fc;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(192,132,252,0.8);
+  margin-bottom: 15px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
 
-        .input-box:focus::before {
-            left: 100%;
-        }
+/* layout */
+.row {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
 
-        .input-box:focus {
-            outline: none;
-            border-color: #667eea;
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
+.label {
+  display: inline-block;
+  width: 160px;
+  color: #c084fc;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(192,132,252,0.6);
+  letter-spacing: 1px;
+}
 
-        .input-box[readonly] {
-            background: yellow;
-            color: #f8f9fa;
-            cursor: not-allowed;
-            border-color: #ced4da;
-        }
+/* entropy */
+#entropyView {
+  padding: 8px 16px;
+  color: #ffcc66;
+  text-shadow: 0 0 8px rgba(255,200,100,0.8);
+  font-weight: bold;
+  font-size: 16px;
+  background: linear-gradient(135deg, rgba(255,200,100,0.1) 0%, rgba(255,200,100,0.05) 100%);
+  border: 1px solid rgba(255,200,100,0.3);
+  border-radius: 20px;
+  display: inline-block;
+  animation: entropyGlow 3s ease-in-out infinite;
+}
 
-        .input-box.active {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            border-color: #667eea;
-            cursor: text;
-            animation: pulse 2s infinite;
-        }
+@keyframes entropyGlow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(255,200,100,0.4);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(255,200,100,0.6);
+    transform: scale(1.02);
+  }
+}
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
-        }
+/* heading */
+h3 {
+  color: #c084fc;
+  text-shadow: 
+    0 0 20px rgba(192,132,252,0.8),
+    0 0 40px rgba(192,132,252,0.5);
+  font-size: 24px;
+  margin-bottom: 30px;
+  text-align: center;
+  letter-spacing: 2px;
+  animation: titlePulse 4s ease-in-out infinite;
+}
 
-        .reset-button {
-            background: linear-gradient(135deg, #5B23FF 0%, #4D2FB2 100%);
-            color: white;
-            border: 5px;
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 25px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 8, 68, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
+@keyframes titlePulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
 
-        .reset-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
-        }
+/* container */
+body > * {
+  position: relative;
+  z-index: 1;
+}
 
-        .reset-button:hover::before {
-            left: 100%;
-        }
+/* ripple effect for inputs */
+input::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.6s ease-out;
+}
 
-        .reset-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 8, 68, 0.4);
-        }
-
-        .reset-button:active {
-            transform: translateY(0);
-        }
-
-        .instructions {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            background: rgba(102, 126, 234, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .instructions strong {
-            color: #667eea;
-        }
-    </style>
+input:not(:disabled):focus::after {
+  transform: translate(-50%, -50%) scale(2);
+  opacity: 0;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Tọa độ mục tiêu 1 :</h1>
-        
-        <div class="result-box" id="result"></div>
-        
-        <button class="reset-button" id="resetBtn">🔄 Reset</button>
-        
-        <div class="input-row">
-            <input type="text" class="input-box" id="box1" maxlength="1" readonly>
-            <input type="text" class="input-box" id="box2" maxlength="1" readonly>
-            <input type="text" class="input-box" id="box3" maxlength="1" readonly>
-            <input type="text" class="input-box" id="box4" maxlength="1" class="active">
-        </div>
-        
-        
+
+<div class="main-container">
+  <h3>Adaptive Quantum Rotor System</h3>
+
+  <div class="input-section">
+    <div class="section-title">Input Register</div>
+    <div class="row">
+      <input id="in0" disabled>
+      <input id="in1" disabled>
+      <input id="in2" disabled>
+      <input id="in3" disabled>
+      <input id="in4" disabled>
+      <input id="in5" maxlength="1" autofocus>
     </div>
+  </div>
 
-    <script>
-        const box1 = document.getElementById('box1');
-        const box2 = document.getElementById('box2');
-        const box3 = document.getElementById('box3');
-        const box4 = document.getElementById('box4');
-        const result = document.getElementById('result');
+  <div class="output-section">
+    <div class="section-title">Output Register</div>
+    <div class="row">
+      <input id="out0" disabled>
+      <input id="out1" disabled>
+      <input id="out2" disabled>
+      <input id="out3" disabled>
+      <input id="out4" disabled>
+    </div>
+  </div>
 
-        // Chỉ cho phép nhập 0 hoặc 1
-        function validateBinaryInput(value) {
-            return value === '0' || value === '1';
+  <div class="row">
+    <span class="label">Entropy:</span>
+    <span id="entropyView"></span>
+  </div>
+</div>
+
+<script>
+const IN = [...Array(6)].map((_, i) => document.getElementById("in" + i));
+const OUT = [...Array(5)].map((_, i) => document.getElementById("out" + i));
+const entropyView = document.getElementById("entropyView");
+
+/* ========= ROTOR MATRIX + ENERGY ========= */
+
+// 3 rotor, mỗi rotor là ma trận 5x5
+let rotors = [...Array(3)].map(() =>
+  [...Array(5)].map(() =>
+    [...Array(5)].map(() => Math.random() < 0.5 ? 1 : 0)
+  )
+);
+
+// năng lượng tích lũy cho từng mask
+let energy = [...Array(3)].map(() =>
+  [...Array(5)].map(() =>
+    [...Array(5)].map(() => 0)
+  )
+);
+
+let prevOutput = [0,0,0,0,0];
+
+const xor = (a,b) => a ^ b;
+
+/* ========= CORE PROCESS ========= */
+
+// matrix rotor + cross influence
+function process(bits) {
+  let state = [...bits];
+
+  for (let r = 0; r < 3; r++) {
+    let next = Array(5).fill(0);
+    for (let i = 0; i < 5; i++) {
+      let v = 0;
+      for (let j = 0; j < 5; j++) {
+        if (rotors[r][i][j]) v ^= state[j];
+      }
+      // ảnh hưởng chéo hàng xóm
+      v ^= state[(i+1)%5];
+      v ^= state[(i+4)%5];
+      next[i] = v;
+    }
+    state = next;
+  }
+  return state;
+}
+
+/* ========= LEARNING ========= */
+
+function accumulateEnergy(output) {
+  for (let r = 0; r < 3; r++) {
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 5; j++) {
+        energy[r][i][j] += output[i] ? 1 : -1;
+        if (Math.abs(energy[r][i][j]) > 3) {
+          rotors[r][i][j] ^= 1;   // học → lật mask
+          energy[r][i][j] = 0;
         }
+      }
+    }
+  }
+}
 
-        // Dịch chuyển dữ liệu từ phải sang trái
-        function shiftLeft() {
-            box1.value = box2.value;
-            box2.value = box3.value;
-            box3.value = box4.value;
-            box4.value = '';
+/* ========= ENTROPY + COLLAPSE ========= */
+
+function entropy(bits) {
+  let p = bits.reduce((a,b)=>a+b,0) / bits.length;
+  if (p === 0 || p === 1) return 0;
+  return -(p*Math.log2(p) + (1-p)*Math.log2(1-p));
+}
+
+function collapse(ent) {
+  if (ent > 0.9) {
+    // collapse mạnh: triệt nhiễu
+    for (let r = 0; r < 3; r++) {
+      for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+          if (Math.random() < 0.3) rotors[r][i][j] = 0;
         }
+      }
+    }
+  }
+}
 
-        // Tính kết quả
-        function calculateResult() {
-            const val1 = box1.value;
-            const val2 = box2.value;
-            const val3 = box3.value;
+/* ========= INPUT HANDLER ========= */
 
-            if (val1 === '' || val2 === '') {
-                result.textContent = 'X';
-                return;
-            }
+IN[5].addEventListener("input", () => {
+  const v = IN[5].value;
+  if (v !== "0" && v !== "1") {
+    IN[5].value = "";
+    return;
+  }
 
-            if (val1 === val2) {
-                result.textContent = val3 ;
-            } else {
-                result.textContent = '1';
-            }
-        }
+  for (let i = 0; i < 5; i++) IN[i].value = IN[i+1].value;
+  IN[4].value = v;
+  IN[5].value = "";
 
-        // Xử lý sự kiện nhập vào ô 4
-        box4.addEventListener('input', function(e) {
-            const value = e.target.value;
-            
-            // Chỉ chấp nhận 0 hoặc 1
-            if (value && !validateBinaryInput(value)) {
-                e.target.value = '';
-                return;
-            }
+  const bits = IN.slice(0,5).map(b => Number(b.value || 0));
+  const out = process(bits);
 
-            // Nếu có giá trị hợp lệ, dịch chuyển và tính kết quả
-            if (value) {
-                shiftLeft();
-                calculateResult();
-            }
-        });
+  out.forEach((v,i) => OUT[i].value = v);
 
-        // Ngăn không cho nhập vào các ô 1, 2, 3
-        [box1, box2, box3].forEach(box => {
-            box.addEventListener('keydown', function(e) {
-                e.preventDefault();
-            });
-            
-            box.addEventListener('focus', function(e) {
-                box4.focus();
-            });
-        });
+  accumulateEnergy(out);
 
-        // Tự động focus vào ô 4 khi tải trang
-        window.addEventListener('load', function() {
-            box4.focus();
-        });
+  const e = entropy(out);
+  entropyView.textContent = e.toFixed(3);
+  collapse(e);
 
-        // Hiển thị bàn phím số trên điện thoại
-        box4.setAttribute('inputmode', 'numeric');
-        box4.setAttribute('pattern', '[01]*');
+  prevOutput = out;
+});
+</script>
 
-        // Reset functionality
-        const resetBtn = document.getElementById('resetBtn');
-        
-        function resetAll() {
-            box1.value = '';
-            box2.value = '';
-            box3.value = '';
-            box4.value = '';
-            result.textContent = '0';
-            result.style.animation = 'none';
-            setTimeout(() => {
-                result.style.animation = '';
-            }, 10);
-            box4.focus();
-        }
-                
-        resetBtn.addEventListener('click', resetAll);
-        
-        // Keyboard shortcut for reset (Ctrl+R)
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'r') {
-                e.preventDefault();
-                resetAll();
-            }
-        });
-    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
