@@ -40,7 +40,7 @@ input {
   height: 42px;
   text-align: center;
   background: linear-gradient(135deg, rgba(139,0,0,0.9) 0%, rgba(180,0,0,0.8) 100%);
-  color: white;
+  color: yellow;
   border: 2px solid rgba(255,100,100,0.6);
   margin: 4px;
   font-size: 18px;
@@ -206,6 +206,34 @@ input:focus {
     transform: scale(1.02);
   }
 }
+/* security icon */
+.security-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: securityPulse 3s ease-in-out infinite;
+}
+
+.security-icon svg {
+  filter: drop-shadow(0 0 15px rgba(147,51,234,0.6));
+  transition: all 0.3s ease;
+}
+
+.security-icon:hover svg {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 25px rgba(147,51,234,0.8));
+}
+
+@keyframes securityPulse {
+  0%, 100% { 
+    opacity: 0.7; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05);
+  }
+}
 
 /* heading */
 h3 {
@@ -255,10 +283,10 @@ input:not(:disabled):focus::after {
 <body>
 
 <div class="main-container">
-  <h3>Adaptive Quantum Rotor System</h3>
+  <h3>Hệ thống mã hóa</h3>
 
   <div class="input-section">
-    <div class="section-title">Input Register</div>
+    <div class="section-title">Nhập dữ liệu:</div>
     <div class="row">
       <input id="in0" disabled>
       <input id="in1" disabled>
@@ -270,7 +298,7 @@ input:not(:disabled):focus::after {
   </div>
 
   <div class="output-section">
-    <div class="section-title">Output Register</div>
+    <div class="section-title">Kết quả mã hóa:</div>
     <div class="row">
       <input id="out0" disabled>
       <input id="out1" disabled>
@@ -401,3 +429,4 @@ IN[5].addEventListener("input", () => {
 
 </body>
 </html>
+
