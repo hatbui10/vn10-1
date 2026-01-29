@@ -390,6 +390,101 @@ function tone(freq = 440, dur = 0.05, vol = 0.08, type = "square") {
 }
 
 /* ======================================================
+   MP3 BACKGROUND MUSIC SYSTEM
+====================================================== */
+let bgMusic = null;
+let isMusicPlaying = false;
+
+function createBackgroundMusic() {
+  // Sử dụng URL MP3 trực tiếp từ internet
+  bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+  bgMusic.loop = true;
+  bgMusic.volume = 0.3;
+  
+  // Event listeners
+  bgMusic.addEventListener('play', () => {
+    isMusicPlaying = true;
+    console.log('🎵 Background music started');
+  });
+  
+  bgMusic.addEventListener('pause', () => {
+    isMusicPlaying = false;
+    console.log('🔇 Background music paused');
+  });
+  
+  bgMusic.addEventListener('error', (e) => {
+    console.log('⚠️ MP3 file not found, using fallback sound');
+    // Fallback: tạo synthetic music với Web Audio API
+    createSyntheticBackground();
+  });
+}
+
+function createSyntheticBackground() {
+  // Tạo nhạc nền synthetic nếu không có file MP3
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc1.type = 'sine';
+  osc1.frequency.value = 220;
+  osc2.type = 'triangle';
+  osc2.frequency.value = 110;
+  
+  gain.gain.value = 0.05;
+  
+  osc1.connect(gain);
+  osc2.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc1.start();
+  osc2.start();
+  
+  bgMusic = { pause: () => { osc1.stop(); osc2.stop(); isMusicPlaying = false; } };
+  isMusicPlaying = true;
+}
+
+function startBackgroundMusic() {
+  if (!bgMusic) {
+    createBackgroundMusic();
+  }
+  
+  if (bgMusic && !isMusicPlaying) {
+    bgMusic.play().catch(e => {
+      console.log('🎵 Auto-play blocked, waiting for user interaction');
+    });
+  }
+}
+
+function stopBackgroundMusic() {
+  if (bgMusic && isMusicPlaying) {
+    bgMusic.pause();
+  }
+}
+
+/* ======================================================
+   KEYBOARD CONTROLS
+====================================================== */
+document.addEventListener('keydown', (e) => {
+  // F5 to stop music and refresh
+  if (e.key === 'F5') {
+    e.preventDefault();
+    stopBackgroundMusic();
+    console.log('🛑 Music stopped by F5');
+    setTimeout(() => location.reload(), 100);
+  }
+  
+  // Space to toggle music (bonus feature)
+  if (e.key === ' ' && e.target.tagName !== 'INPUT') {
+    e.preventDefault();
+    if (isMusicPlaying) {
+      stopBackgroundMusic();
+    } else {
+      startBackgroundMusic();
+    }
+  }
+});
+
+/* ======================================================
    STATE
 ====================================================== */
 let currentSTT = null;
@@ -417,6 +512,11 @@ window.onload = () => IDX_NEXT.focus();
    STT INPUT
 ====================================================== */
 IDX_NEXT.addEventListener("input", () => {
+  // Bắt đầu nhạc nền khi lần đầu tiên nhập STT
+  if (!isMusicPlaying) {
+    startBackgroundMusic();
+  }
+  
   IDX_NEXT.value = IDX_NEXT.value.replace(/\D/g, "");
 
   if (IDX_NEXT.value.length < 3) return;
@@ -442,18 +542,6 @@ let energy = [...Array(3)].map(() =>
     [...Array(5)].map(() => 0)
   )
 );
-// === ROTOR WARM-UP (entropy injection) ===
-for(let k = 0; k < 8; k++){
-  const noise = [
-    Math.random() < 0.5 ? 1 : 0,
-    Math.random() < 0.5 ? 1 : 0,
-    Math.random() < 0.5 ? 1 : 0,
-    Math.random() < 0.5 ? 1 : 0,
-    Math.random() < 0.5 ? 1 : 0
-  ];
-  const out = process(noise);
-  accumulateEnergy(out);
-}
 
 function process(bits){
   let state=[...bits];
@@ -600,5 +688,4 @@ IN[5].addEventListener("input",()=>{
 
 </body>
 </html>
-
 
