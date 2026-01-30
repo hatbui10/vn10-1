@@ -259,7 +259,12 @@ function renderHistory() {
   historyView.innerHTML = "";
   history.forEach(item => {
     const li = document.createElement("li");
-    li.textContent = `${item.pattern} : vị trí số ${item.pos}`;
+
+    const note = item.pos !== 0
+      ? " (bắt đầu tính từ vị trí số 0)"
+      : "";
+
+    li.textContent = `${item.pattern} : vị trí số ${item.pos}${note}`;
     historyView.appendChild(li);
   });
 }
@@ -303,7 +308,7 @@ input6.addEventListener("input", () => {
     }
 
     history.unshift({ pattern, pos });
-    if (history.length > 64) history.pop();
+    if (history.length > 32) history.pop();
 
     renderHistory();
 
@@ -319,5 +324,4 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
-
 
