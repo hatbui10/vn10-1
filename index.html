@@ -120,12 +120,28 @@ let history = [];
 let serialCounter = 0;
 function renderHistory() {
   historyView.innerHTML = "";
+
+  let basePos = null; // pos của lần trùng đầu tiên
+
   history.forEach(item => {
     const stt = item.serialNumber;
-    const usePos = item.pos > 0 ? stt + item.pos : 0;
+    let usePos = 0;
+
+    // nếu có trùng
+    if (item.pos > 0) {
+      // lưu pos gốc chỉ 1 lần
+      if (basePos === null) {
+        basePos = item.pos;
+      }
+
+      // luôn dùng pos gốc + stt hiện tại
+      usePos = basePos + stt;
+    }
+
     const note = usePos > 0
       ? ` → dùng ${item.pattern} tại vị trí số ${usePos}`
       : " → chưa trùng";
+
     const li = document.createElement("li");
     li.innerHTML = `
       <strong>#${stt}</strong>
@@ -180,4 +196,5 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
