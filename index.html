@@ -221,15 +221,17 @@ if (!posLocked) {
       }
     }
      
-    if (history.length > 132) history.pop();
-    renderHistory();
-    setTimeout(resetCells, 350);
-  }
+    addHistoryItem(pattern, pos); // 🔥 DÒNG BỊ THIẾU
+
+if (history.length > 132) history.shift();
+renderHistory();
+setTimeout(resetCells, 350);
 });
 window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
 
