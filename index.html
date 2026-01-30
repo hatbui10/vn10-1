@@ -121,21 +121,28 @@ let serialCounter = 0;
 function renderHistory() {
   historyView.innerHTML = "";
 
-  let basePos = null; // pos của lần trùng đầu tiên
+  let basePos = null;
+  let matchCount = 0;
 
   history.forEach(item => {
     const stt = item.serialNumber;
     let usePos = 0;
 
-    // nếu có trùng
     if (item.pos > 0) {
-      // lưu pos gốc chỉ 1 lần
+
+      // nếu đã đủ 5 lần → reset
+      if (matchCount >= 5) {
+        basePos = null;
+        matchCount = 0;
+      }
+
+      // nếu chưa có mốc thì lấy mốc mới
       if (basePos === null) {
         basePos = item.pos;
       }
 
-      // luôn dùng pos gốc + stt hiện tại
       usePos = basePos + stt;
+      matchCount++;
     }
 
     const note = usePos > 0
@@ -152,6 +159,9 @@ function renderHistory() {
     historyView.appendChild(li);
   });
 }
+
+
+  
 function resetCells() {
   buffer = [];
   for (let i = 0; i < 5; i++) {
@@ -196,5 +206,6 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
