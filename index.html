@@ -2,745 +2,318 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Adaptive Quantum Rotor</title>
+<title>Binary Batch Checker</title>
 
 <style>
-body {
-  background: radial-gradient(circle at top, #0a0a1a 0%, #000511 40%, #000000 100%);
-  color: #00ffcc;
-  font-family: 'Courier New', monospace;
-  padding: 20px;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Animated background particles */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(0,255,204,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(0,136,255,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 50% 20%, rgba(102,255,238,0.05) 0%, transparent 50%);
-  animation: quantumPulse 4s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes quantumPulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
-}
-
-/* Main container with glassmorphism */
-.main-container {
-  max-width: 700px;
-  margin: 40px auto;
-  background: linear-gradient(135deg, rgba(20,0,40,0.9) 0%, rgba(40,0,60,0.8) 100%);
-  border: 2px solid rgba(102,255,238,0.6);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 
-    0 0 60px rgba(102,255,238,0.4),
-    0 0 120px rgba(102,255,238,0.2),
-    inset 0 0 40px rgba(102,255,238,0.1);
-  backdrop-filter: blur(20px);
-  position: relative;
-  overflow: hidden;
-}
-
-.main-container::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #00ffcc, #0088ff, #ff00ff, #00ffcc);
-  border-radius: 24px;
-  z-index: -1;
-  opacity: 0.6;
-}
-
-
-/* Title with glow effect */
-h3 {
-  text-align: center;
-  color: #00ffcc;
-  font-size: 28px;
-  margin-bottom: 30px;
-  text-shadow: 
-    0 0 20px rgba(0,255,204,0.8),
-    0 0 40px rgba(0,255,204,0.6),
-    0 0 60px rgba(0,255,204,0.4);
-  animation: titleGlow 3s ease-in-out infinite;
-  letter-spacing: 3px;
-  font-weight: bold;
-}
-
-@keyframes titleGlow {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
-
-/* Section titles */
-.section-title {
-  text-align: center;
-  color: #ff66ff;
-  margin: 20px 0 15px 0;
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  text-shadow: 0 0 15px rgba(255,102,255,0.8);
-  animation: sectionPulse 4s ease-in-out infinite;
-}
-
-@keyframes sectionPulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-/* Row layout */
-.row {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  position: relative;
-}
-
-/* Base input styles */
-input {
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  background: linear-gradient(135deg, rgba(139,0,0,0.9) 0%, rgba(180,0,0,0.8) 100%);
-  color: #ffff00;
-  border: 2px solid rgba(255,100,100,0.8);
-  margin: 4px;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 12px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  box-shadow: 
-    0 0 15px rgba(255,0,0,0.4),
-    inset 0 0 10px rgba(255,0,0,0.2);
-}
-
-/* Disabled inputs (display) */
-input:disabled {
-  opacity: 1;
-  background: linear-gradient(135deg, rgba(80,0,0,0.9) 0%, rgba(120,0,0,0.8) 100%);
-  color: #ffffff;
-  border-color: rgba(255,100,100,0.6);
-  box-shadow: 
-    0 0 10px rgba(255,0,0,0.3),
-    inset 0 0 8px rgba(255,0,0,0.1);
-}
-
-/* Hover effect for disabled inputs */
-input:disabled:hover {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 
-    0 6px 20px rgba(255,0,0,0.5),
-    0 0 25px rgba(255,0,0,0.4),
-    inset 0 0 15px rgba(255,0,0,0.2);
-  border-color: rgba(255,150,150,0.9);
-}
-
-/* Active inputs */
-input:not(:disabled) {
-  border-color: rgba(255,150,150,0.9);
-  background: linear-gradient(135deg, rgba(160,0,0,0.9) 0%, rgba(200,0,0,0.8) 100%);
-  box-shadow:
-    0 0 20px rgba(255,0,0,0.8),
-    0 0 40px rgba(255,0,0,0.6),
-    0 0 60px rgba(255,0,0,0.4),
-    inset 0 0 25px rgba(255,0,0,0.3);
-  animation: inputGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes inputGlow {
-  from { 
-    box-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,0,0,0.6), 0 0 60px rgba(255,0,0,0.4), inset 0 0 25px rgba(255,0,0,0.3); 
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-  to { 
-    box-shadow: 0 0 30px rgba(255,0,0,1), 0 0 60px rgba(255,0,0,0.8), 0 0 90px rgba(255,0,0,0.6), inset 0 0 35px rgba(255,0,0,0.4); 
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
   }
-}
 
-/* Focus effect */
-input:focus {
-  outline: none;
-  transform: translateY(-4px) scale(1.12);
-  box-shadow:
-    0 0 35px rgba(255,0,0,1),
-    0 0 70px rgba(255,0,0,0.8),
-    0 0 105px rgba(255,0,0,0.6),
-    inset 0 0 40px rgba(255,0,0,0.5);
-  border-color: rgba(255,200,200,1);
-  background: linear-gradient(135deg, rgba(180,0,0,0.9) 0%, rgba(220,0,0,0.8) 100%);
-}
-
-/* STT inputs special styling */
-.idx {
-  background: linear-gradient(135deg, rgba(230,230,255,0.9) 0%, rgba(200,200,255,0.8) 100%) !important;
-  color: #000066 !important;
-  border-color: rgba(100,100,255,0.8) !important;
-  box-shadow: 
-    0 0 15px rgba(100,100,255,0.4),
-    inset 0 0 10px rgba(100,100,255,0.2) !important;
-}
-
-.idx:disabled {
-  background: linear-gradient(135deg, rgba(180,180,255,0.9) 0%, rgba(150,150,255,0.8) 100%) !important;
-  color: #000033 !important;
-}
-
-.idx:not(:disabled) {
-  background: linear-gradient(135deg, rgba(200,200,255,0.9) 0%, rgba(170,170,255,0.8) 100%) !important;
-  border-color: rgba(120,120,255,0.9) !important;
-  box-shadow:
-    0 0 20px rgba(120,120,255,0.8),
-    0 0 40px rgba(120,120,255,0.6),
-    inset 0 0 20px rgba(120,120,255,0.3) !important;
-}
-
-/* Special styling for STT input (idx5) */
-#idx5 {
-  background: linear-gradient(135deg, rgba(255,255,200,0.9) 0%, rgba(255,255,150,0.8) 100%) !important;
-  color: #666600 !important;
-  border-color: rgba(200,200,100,0.9) !important;
-  box-shadow:
-    0 0 20px rgba(255,255,100,0.8),
-    0 0 40px rgba(255,255,100,0.6),
-    inset 0 0 20px rgba(255,255,100,0.3) !important;
-  animation: sttInputGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes sttInputGlow {
-  from { 
-    box-shadow: 0 0 20px rgba(255,255,100,0.8), 0 0 40px rgba(255,255,100,0.6), inset 0 0 20px rgba(255,255,100,0.3); 
+  .container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    max-width: 600px;
+    width: 100%;
+    animation: slideIn 0.5s ease-out;
   }
-  to { 
-    box-shadow: 0 0 30px rgba(255,255,100,1), 0 0 60px rgba(255,255,100,0.8), inset 0 0 30px rgba(255,255,100,0.4); 
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-#idx5:focus {
-  transform: translateY(-4px) scale(1.12);
-  box-shadow:
-    0 0 35px rgba(255,255,100,1),
-    0 0 70px rgba(255,255,100,0.8),
-    inset 0 0 40px rgba(255,255,100,0.5);
-  border-color: rgba(255,255,200,1);
-}
-
-/* Entropy display */
-#entropyView {
-  padding: 10px 20px;
-  color: #ffcc00;
-  font-weight: bold;
-  font-size: 18px;
-  background: linear-gradient(135deg, rgba(255,200,0,0.2) 0%, rgba(255,150,0,0.1) 100%);
-  border: 1px solid rgba(255,200,0,0.5);
-  border-radius: 25px;
-  display: inline-block;
-  text-shadow: 0 0 10px rgba(255,200,0,0.8);
-  animation: entropyGlow 3s ease-in-out infinite;
-  min-width: 80px;
-  text-align: center;
-}
-
-@keyframes entropyGlow {
-  0%, 100% { 
-    box-shadow: 0 0 15px rgba(255,200,0,0.5);
-    transform: scale(1);
+  h3 {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 30px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   }
-  50% { 
-    box-shadow: 0 0 25px rgba(255,200,0,0.7);
+
+  .row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    justify-content: center;
+  }
+
+  input {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 3px solid #e2e8f0;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #f7fafc, #edf2f7);
+    color: #2d3748;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #667eea;
     transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   }
-}
 
-/* Ripple effect for inputs */
-input::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
-  transform: translate(-50%, -50%) scale(0);
-  border-radius: 50%;
-  pointer-events: none;
-  transition: transform 0.6s ease-out;
-}
+  input:disabled {
+    background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+    color: #94a3b8;
+    cursor: not-allowed;
+  }
 
-input:not(:disabled):focus::after {
-  transform: translate(-50%, -50%) scale(2.5);
-  opacity: 0;
-}
+  input.mark {
+    background: linear-gradient(145deg, #ffd966, #ffc107);
+    border-color: #ffc107;
+    color: #7c2d12;
+    animation: pulse 0.6s ease-in-out;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.6);
+  }
 
-/* Special glow for different sections */
-#cpy0, #cpy1, #cpy2, #cpy3, #cpy4 {
-  border-color: rgba(0,255,136,0.8) !important;
-  background: linear-gradient(135deg, rgba(0,100,50,0.9) 0%, rgba(0,150,75,0.8) 100%) !important;
-  color: #00ff88 !important;
-}
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
 
-#out0, #out1, #out2, #out3, #out4 {
-  border-color: rgba(0,136,255,0.8) !important;
-  background: linear-gradient(135deg, rgba(0,50,100,0.9) 0%, rgba(0,75,150,0.8) 100%) !important;
-  color: #00aaff !important;
-}
+  .result-section {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+    border-radius: 15px;
+    border: 2px solid #e2e8f0;
+  }
+
+  .result-section p {
+    color: #4a5568;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+
+  #result {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #667eea;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  h4 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  #historyView {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 15px;
+    padding: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid #e2e8f0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  #historyView::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #historyView::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+
+  #historyView::-webkit-scrollbar-thumb {
+    background: linear-gradient(145deg, #cbd5e0, #a0aec0);
+    border-radius: 10px;
+  }
+
+  #historyView li {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: linear-gradient(145deg, #f7fafc, #edf2f7);
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    color: #2d3748;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    animation: slideInLeft 0.3s ease-out;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  #historyView li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left-color: #764ba2;
+  }
+
+  /* Responsive design */
+  @media (max-width: 600px) {
+    .container {
+      padding: 20px;
+      margin: 10px;
+    }
+    
+    input {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+    }
+    
+    .row {
+      gap: 8px;
+    }
+    
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
 </style>
 </head>
 
 <body>
 
-<div class="main-container">
-<h3 style="text-align:center;color:#c084fc;">Hệ thống mật mã cấp cao @_@</h3>
+<div class="container">
+  <h3>Nhập 0 / 1 tại ô cuối (đủ 5 sẽ tự kiểm tra & reset)</h3>
 
-<div class="section-title">Nhập STT:</div>
-<div class="row">
-  <input class="idx" id="idx0" disabled>
-  <input class="idx" id="idx1" disabled>
-  <input class="idx" id="idx2" disabled>
-  <input class="idx" id="idx3" disabled>
-  <input class="idx" id="idx4" disabled>
-  <input id="idx5" maxlength="3">
-</div>
+  <div class="row" id="cells">
+    <input disabled>
+    <input disabled>
+    <input disabled>
+    <input disabled>
+    <input disabled>
+    <input id="input6" maxlength="1">
+  </div>
 
-<div class="section-title">Nhập giá trị tương ứng:</div>
-<div class="row">
-  <input id="in0" disabled>
-  <input id="in1" disabled>
-  <input id="in2" disabled>
-  <input id="in3" disabled>
-  <input id="in4" disabled>
-  <input id="in5" maxlength="1">
-</div>
+  <div class="result-section">
+    <p>Kết quả so trùng (0 = không trùng trong 10 lần):</p>
+    <strong id="result">-</strong>
+  </div>
 
-<div class="section-title">COPY</div>
-<div class="row">
-  <input id="cpy0" disabled>
-  <input id="cpy1" disabled>
-  <input id="cpy2" disabled>
-  <input id="cpy3" disabled>
-  <input id="cpy4" disabled>
-</div>
-
-<div class="section-title">Kết quả mã hóa:</div>
-<div class="row">
-  <input id="out0" disabled>
-  <input id="out1" disabled>
-  <input id="out2" disabled>
-  <input id="out3" disabled>
-  <input id="out4" disabled>
-</div>
-
-<div class="row">
-  <span>Entropy:</span>
-  <span id="entropyView">0.000</span>
-</div>
-
-<div class="section-title" style="margin-top: 30px;">ROTOR STATUS</div>
-<div class="row">
-  <span style="color: #ff66ff; font-size: 12px;">Energy Level:</span>
-  <span id="energyStatus" style="color: #ffcc00; font-size: 12px;">Low</span>
-</div>
-<div class="row">
-  <span style="color: #ff66ff; font-size: 12px;">Collapse Count:</span>
-  <span id="collapseCount" style="color: #ffcc00; font-size: 12px;">0</span>
-</div>
-<div class="row">
-  <span style="color: #ff66ff; font-size: 12px;">Copy Count:</span>
-  <span id="copyCount" style="color: #ffcc00; font-size: 12px;">0</span>
-</div>
+  <h4>Lịch sử (tối đa 32 dãy)</h4>
+  <ul id="historyView"></ul>
 </div>
 
 <script>
-/* ======================================================
-   AUDIO ENGINE
-====================================================== */
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioCtx();
+const inputs = document.querySelectorAll("#cells input");
+const input6 = document.getElementById("input6");
+const result = document.getElementById("result");
+const historyView = document.getElementById("historyView");
 
-function tone(freq = 440, dur = 0.05, vol = 0.08, type = "square") {
-  if (audioCtx.state === "suspended") audioCtx.resume();
+let buffer = [];   // chứa 5 số đang nhập
+let history = [];  // lịch sử đã kiểm tra
 
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.type = type;
-  osc.frequency.value = freq;
-
-  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start();
-  osc.stop(audioCtx.currentTime + dur);
-}
-
-/* ======================================================
-   MP3 BACKGROUND MUSIC SYSTEM
-====================================================== */
-let bgMusic = null;
-let isMusicPlaying = false;
-
-function createBackgroundMusic() {
-  // Sử dụng URL MP3 trực tiếp từ internet
-  bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-  bgMusic.loop = true;
-  bgMusic.volume = 0.3;
-  
-  // Event listeners
-  bgMusic.addEventListener('play', () => {
-    isMusicPlaying = true;
-    console.log('🎵 Background music started');
-  });
-  
-  bgMusic.addEventListener('pause', () => {
-    isMusicPlaying = false;
-    console.log('🔇 Background music paused');
-  });
-  
-  bgMusic.addEventListener('error', (e) => {
-    console.log('⚠️ MP3 file not found, using fallback sound');
-    // Fallback: tạo synthetic music với Web Audio API
-    createSyntheticBackground();
+function renderHistory() {
+  historyView.innerHTML = "";
+  history.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.pattern} : vị trí số ${item.pos}`;
+    historyView.appendChild(li);
   });
 }
 
-function createSyntheticBackground() {
-  // Tạo nhạc nền synthetic nếu không có file MP3
-  const osc1 = audioCtx.createOscillator();
-  const osc2 = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  
-  osc1.type = 'sine';
-  osc1.frequency.value = 220;
-  osc2.type = 'triangle';
-  osc2.frequency.value = 110;
-  
-  gain.gain.value = 0.05;
-  
-  osc1.connect(gain);
-  osc2.connect(gain);
-  gain.connect(audioCtx.destination);
-  
-  osc1.start();
-  osc2.start();
-  
-  bgMusic = { pause: () => { osc1.stop(); osc2.stop(); isMusicPlaying = false; } };
-  isMusicPlaying = true;
-}
-
-function startBackgroundMusic() {
-  if (!bgMusic) {
-    createBackgroundMusic();
-  }
-  
-  if (bgMusic && !isMusicPlaying) {
-    bgMusic.play().catch(e => {
-      console.log('🎵 Auto-play blocked, waiting for user interaction');
-    });
+function resetCells() {
+  buffer = [];
+  for (let i = 0; i < 5; i++) {
+    inputs[i].value = "";
+    inputs[i].classList.remove("mark");
   }
 }
 
-function stopBackgroundMusic() {
-  if (bgMusic && isMusicPlaying) {
-    bgMusic.pause();
-  }
-}
+input6.addEventListener("input", () => {
+  const val = input6.value;
+  input6.value = "";
 
-/* ======================================================
-   KEYBOARD CONTROLS
-====================================================== */
-document.addEventListener('keydown', (e) => {
-  // F5 to stop music and refresh
-  if (e.key === 'F5') {
-    e.preventDefault();
-    stopBackgroundMusic();
-    console.log('🛑 Music stopped by F5');
-    setTimeout(() => location.reload(), 100);
-  }
-  
-  // Space to toggle music (bonus feature)
-  if (e.key === ' ' && e.target.tagName !== 'INPUT') {
-    e.preventDefault();
-    if (isMusicPlaying) {
-      stopBackgroundMusic();
-    } else {
-      startBackgroundMusic();
+  if (!/^[01]$/.test(val)) return;
+  if (buffer.length >= 5) return;
+
+  buffer.push(val);
+  inputs[buffer.length - 1].value = val;
+
+  // đủ 5 ô → kiểm tra
+  if (buffer.length === 5) {
+    const pattern = buffer.join("");
+
+    let pos = 0;
+    for (let i = 0; i < Math.min(10, history.length); i++) {
+      if (history[i].pattern === pattern) {
+        pos = i + 1;
+        break;
+      }
     }
+
+    result.textContent = pos;
+
+    if (pos > 0) {
+      for (let i = 0; i < 5; i++) {
+        inputs[i].classList.add("mark");
+      }
+    }
+
+    history.unshift({ pattern, pos });
+    if (history.length > 32) history.pop();
+
+    renderHistory();
+
+    // reset sau 0.5s cho dễ nhìn
+    setTimeout(resetCells, 500);
   }
 });
 
-/* ======================================================
-   STATE
-====================================================== */
-let currentSTT = null;
-let collapseCounter = 0;
-let copyCounter = 0;
-
-/* ======================================================
-   CHAOS / ENTROPY FROM USER
-====================================================== */
-let chaos = Date.now();
-
-document.addEventListener("mousemove", e => {
-  chaos ^= (e.clientX << 16) ^ e.clientY;
-});
-
-document.addEventListener("keydown", e => {
-  chaos ^= e.keyCode * 2654435761;
-});
-
-/* ======================================================
-   ELEMENTS
-====================================================== */
-const IDX = [...Array(5)].map((_,i)=>document.getElementById("idx"+i));
-const IN  = [...Array(6)].map((_,i)=>document.getElementById("in"+i));
-const CPY = [...Array(5)].map((_,i)=>document.getElementById("cpy"+i));
-const OUT = [...Array(5)].map((_,i)=>document.getElementById("out"+i));
-
-const IDX_NEXT = document.getElementById("idx5");
-const entropyView = document.getElementById("entropyView");
-const energyStatus = document.getElementById("energyStatus");
-const collapseCount = document.getElementById("collapseCount");
-const copyCount = document.getElementById("copyCount");
-
-/* ======================================================
-   AUTO FOCUS
-====================================================== */
-window.onload = () => IDX_NEXT.focus();
-
-/* ======================================================
-   STT INPUT
-====================================================== */
-IDX_NEXT.addEventListener("input", () => {
-  // Bắt đầu nhạc nền khi lần đầu tiên nhập STT
-  if (!isMusicPlaying) {
-    startBackgroundMusic();
-  }
-  
-  IDX_NEXT.value = IDX_NEXT.value.replace(/\D/g, "");
-
-  if (IDX_NEXT.value.length < 3) return;
-
-  currentSTT = parseInt(IDX_NEXT.value, 10);
-  IDX_NEXT.value = "";
-
-  tone(220, 0.07);       // STT locked
-  IN[5].focus();
-});
-
-
-function mulberry32(seed) {
-  return function() {
-    let t = seed += 0x6D2B79F5;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-const rand = mulberry32(chaos);
-
-/* ======================================================
-   ROTOR + ENERGY
-====================================================== */
-let rotors = [...Array(3)].map(() =>
-  [...Array(5)].map(() =>
-    [...Array(5)].map(() => Math.random() < 0.5 ? 1 : 0)
-  )
-);
-
-let energy = [...Array(3)].map(() =>
-  [...Array(5)].map(() =>
-    [...Array(5)].map(() => 0)
-  )
-);
-
-function rotateRotors(){
-  for(let r=0;r<3;r++){
-    // Xoay rotor: mỗi hàng dịch xuống 1, hàng cuối lên đầu
-    let temp = rotors[r][4];
-    for(let i=4;i>0;i--){
-      rotors[r][i] = rotors[r][i-1];
-    }
-    rotors[r][0] = temp;
-  }
-}
-
-function process(bits){
-  let state=[...bits];
-  for(let r=0;r<3;r++){
-    let next=Array(5).fill(0);
-    for(let i=0;i<5;i++){
-      let v=0;
-      for(let j=0;j<5;j++){
-        if(rotors[r][i][j]) v ^= state[j];
-      }
-      v ^= state[(i+1)%5];
-      v ^= state[(i+4)%5];
-      next[i]=v;
-    }
-    state=next;
-  }
-  return state;
-}
-
-function accumulateEnergy(out){
-  for(let r=0;r<3;r++){
-    for(let i=0;i<5;i++){
-      for(let j=0;j<5;j++){
-        energy[r][i][j] += out[i] ? 1 : -1;
-        if(Math.abs(energy[r][i][j]) > 3){
-          rotors[r][i][j] ^= 1;
-          energy[r][i][j] = 0;
-        }
-      }
-    }
-  }
-}
-
-function entropy(bits){
-  let p = bits.reduce((a,b)=>a+b,0)/bits.length;
-  if(p===0||p===1) return 0;
-  return -(p*Math.log2(p)+(1-p)*Math.log2(1-p));
-}
-
-/* ======================================================
-   COLLAPSE
-====================================================== */
-function collapse(ent){
-  if(ent > 0.9){
-    for(let r=0;r<3;r++)
-      for(let i=0;i<5;i++)
-        for(let j=0;j<5;j++)
-          if(Math.random()<0.3) rotors[r][i][j]=0;
-
-    energy = [...Array(3)].map(() =>
-      [...Array(5)].map(() =>
-        [...Array(5)].map(() => 0)
-      )
-    );
-
-    collapseCounter++;
-    collapseCount.textContent = collapseCounter;
-    energyStatus.textContent = "COLLAPSED";
-    energyStatus.style.color = "#ff4444";
-
-    // collapse sound
-    for(let i=0;i<5;i++){
-      setTimeout(()=>tone(900+i*120,0.05,0.07,"sawtooth"), i*50);
-    }
-
-    setTimeout(()=>{
-      energyStatus.textContent="Low";
-      energyStatus.style.color="#00ff00";
-    },1500);
-  }
-}
-
-/* ======================================================
-   BIT INPUT
-====================================================== */
-IN[5].addEventListener("input",()=>{
-  const v = IN[5].value;
-  if(v!=="0" && v!=="1"){ IN[5].value=""; return; }
-  if(currentSTT===null) return;
-
-  tone(v==="0"?600:800,0.04);
-
-  currentSTT++;
-
-  for(let i=0;i<4;i++){
-    IDX[i].value = IDX[i+1].value;
-    IN[i].value  = IN[i+1].value;
-  }
-
-  IDX[4].value = String(currentSTT).padStart(3,"0");
-  IN[4].value  = v;
-  IN[5].value  = "";
-
-  tone(400,0.03); // shift sound
-
-  let filledCount = IN.slice(0,5).filter(x=>x.value!=="").length;
-  if(filledCount === 5){
-    setTimeout(()=>{
-      tone(300,0.08); // buffer full
-
-      for(let i=0;i<5;i++){
-        CPY[i].value = IN[i].value;
-        IN[i].value  = "";
-      }
-      
-      // Tăng số lần copy
-      copyCounter++;
-      copyCount.textContent = copyCounter;
-
-      const bits = CPY.map(x=>Number(x.value));
-      const out  = process(bits);
-      
-      console.log("Trước khi đảo:", out);
-      
-      // Đảo bit số 2 và 4 (index 1 và 3) trước khi hiển thị
-      out[1] ^= 1; // Đảo bit thứ 2
-      out[3] ^= 1; // Đảo bit thứ 4
-      
-      console.log("Sau khi đảo:", out);
-      
-      out.forEach((v,i)=>OUT[i].value=v);
-
-      // Xoay rotor sau khi xử lý xong
-      rotateRotors();
-
-      accumulateEnergy(out);
-
-      const ent = entropy(out);
-      entropyView.textContent = ent.toFixed(3);
-      tone(300+ent*800,0.06,0.06,"triangle");
-
-      let totalEnergy=0;
-      for(let r=0;r<3;r++)
-        for(let i=0;i<5;i++)
-          for(let j=0;j<5;j++)
-            totalEnergy+=Math.abs(energy[r][i][j]);
-
-      if(totalEnergy>50){
-        energyStatus.textContent="High";
-        energyStatus.style.color="#ff6600";
-      }else if(totalEnergy>20){
-        energyStatus.textContent="Medium";
-        energyStatus.style.color="#ffcc00";
-      }else{
-        energyStatus.textContent="Low";
-        energyStatus.style.color="#00ff00";
-      }
-
-      collapse(ent);
-
-      for(let i=0;i<5;i++) IDX[i].value="";
-      currentSTT=null;
-
-      tone(180,0.1); // cycle reset
-      IDX_NEXT.focus();
-
-    },1000);
-  }
+window.addEventListener("load", () => {
+  document.getElementById("input6").focus();
 });
 </script>
 
