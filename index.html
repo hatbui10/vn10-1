@@ -157,7 +157,7 @@ input6.addEventListener("input", () => {
 input6.disabled = true;
     const pattern = buffer.join("");
     let pos = 0;
-    for (let i = 0; i < Math.min(10, history.length); i++) {
+    for (let i = 0; i < Math.min(90, history.length); i++) {
       if (history[i].pattern === pattern) {
         pos = i + 1;
         break;
@@ -171,7 +171,7 @@ input6.disabled = true;
     }
     serialCounter++;
     history.unshift({ pattern, pos, serialNumber: serialCounter });
-    if (history.length > 32) history.pop();
+    if (history.length > 132) history.pop();
     renderHistory();
     setTimeout(resetCells, 350);
   }
@@ -180,3 +180,4 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
