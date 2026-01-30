@@ -23,7 +23,7 @@ body {
 }
 
 .container {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255,255,255,0.95);
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
@@ -165,6 +165,7 @@ function resetCells() {
     inputs[i].value = "";
     inputs[i].classList.remove("mark");
   }
+  input6.focus(); // cực kỳ quan trọng cho mobile
 }
 
 input6.addEventListener("input", () => {
@@ -172,6 +173,7 @@ input6.addEventListener("input", () => {
   input6.value = "";
 
   if (!/^[01]$/.test(val)) return;
+  if (buffer.length >= 5) return;
 
   buffer.push(val);
   inputs[buffer.length - 1].value = val;
@@ -200,7 +202,7 @@ input6.addEventListener("input", () => {
     if (history.length > 32) history.pop();
 
     renderHistory();
-    setTimeout(resetCells, 400);
+    setTimeout(resetCells, 350);
   }
 });
 
