@@ -3,14 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>Binary Batch Checker</title>
-
 <style>
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
-
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,7 +19,6 @@
     align-items: flex-start;
     color: #333;
   }
-
   .container {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
@@ -31,25 +28,21 @@
     width: 100%;
     animation: slideIn 0.5s ease-out;
   }
-
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-30px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   h3, h4 {
     text-align: center;
     color: #4a5568;
     margin-bottom: 20px;
   }
-
   .row {
     display: flex;
     gap: 12px;
     justify-content: center;
     margin-bottom: 25px;
   }
-
   input {
     width: 60px;
     height: 60px;
@@ -61,29 +54,24 @@
     background: #f7fafc;
     transition: all 0.25s ease;
   }
-
   input:focus {
     outline: none;
     border-color: #667eea;
     transform: scale(1.05);
   }
-
   input:disabled {
     background: #edf2f7;
     color: #94a3b8;
   }
-
   input.mark {
     background: #ffc107;
     border-color: #ffb300;
     animation: pulse 0.5s ease-in-out;
   }
-
   @keyframes pulse {
     0%,100% { transform: scale(1); }
     50% { transform: scale(1.1); }
   }
-
   .result-section {
     text-align: center;
     padding: 15px;
@@ -91,20 +79,17 @@
     border-radius: 15px;
     margin-bottom: 25px;
   }
-
   #result {
     font-size: 2rem;
     font-weight: bold;
     color: #667eea;
   }
-
   #historyView {
     list-style: none;
     max-height: 300px;
     overflow-y: auto;
     padding-right: 5px;
   }
-
   #historyView li {
     padding: 10px 14px;
     margin-bottom: 8px;
@@ -115,12 +100,9 @@
   }
 </style>
 </head>
-
 <body>
-
 <div class="container">
   <h3>Nhập 0 / 1 tại ô cuối (đủ 5 sẽ tự kiểm tra & reset)</h3>
-
   <div class="row" id="cells">
     <input disabled>
     <input disabled>
@@ -135,52 +117,40 @@
   maxlength="1"
 />
   </div>
-
   <div class="result-section">
     <p>Kết quả so trùng (0 = không trùng trong 10 lần):</p>
     <div id="result">-</div>
   </div>
-
   <h4>Lịch sử (tối đa 32 dãy)</h4>
   <ul id="historyView"></ul>
 </div>
-
 <script>
 const inputs = document.querySelectorAll("#cells input");
 const input6 = document.getElementById("input6");
 const result = document.getElementById("result");
 const historyView = document.getElementById("historyView");
-
 let buffer = [];
 let history = [];
 let serialCounter = 0;
 function renderHistory() {
   historyView.innerHTML = "";
-
   history.forEach(item => {
     const li = document.createElement("li");
-
     // STT thực tế trong danh sách (bắt đầu từ 1)
     const stt = item.serialNumber;
-
     // vị trí cần dùng = STT + item.pos (nếu pos = 0 thì coi như không cộng)
     const usePos = item.pos > 0 ? stt + item.pos : 0;
-
     const note = usePos > 0
-      ? ` → dùng tại vị trí số ${usePos}`
-      : ` → chưa trùng trong 10 dãy gần nhất`;
-
+      ? ` → dùng tại vị trí số # ${usePos}`;
     li.innerHTML = `
       <strong>#${stt}</strong>
       ${item.pattern}
       | pos=${item.pos}
       ${note}
     `;
-
     historyView.appendChild(li);
   });
 }
-
 function resetCells() {
   buffer = [];
   for (let i = 0; i < 5; i++) {
@@ -188,20 +158,15 @@ function resetCells() {
     inputs[i].classList.remove("mark");
   }
 }
-
 input6.addEventListener("input", () => {
   const val = input6.value;
   input6.value = "";
-
   if (!/^[01]$/.test(val)) return;
   if (buffer.length >= 5) return;
-
   buffer.push(val);
   inputs[buffer.length - 1].value = val;
-
   if (buffer.length === 5) {
     const pattern = buffer.join("");
-
     let pos = 0;
     for (let i = 0; i < Math.min(10, history.length); i++) {
       if (history[i].pattern === pattern) {
@@ -209,31 +174,22 @@ input6.addEventListener("input", () => {
         break;
       }
     }
-
     result.textContent = pos;
-
     if (pos > 0) {
       for (let i = 0; i < 5; i++) {
         inputs[i].classList.add("mark");
       }
     }
-
     serialCounter++;
     history.unshift({ pattern, pos, serialNumber: serialCounter });
     if (history.length > 32) history.pop();
-
     renderHistory();
     setTimeout(resetCells, 500);
   }
 });
-
 window.addEventListener("load", () => {
   input6.focus();
 });
 </script>
-
 </body>
 </html>
-
-
-
