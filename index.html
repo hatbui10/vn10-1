@@ -303,7 +303,7 @@ input6.addEventListener("input", () => {
     }
 
     history.unshift({ pattern, pos });
-    if (history.length > 32) history.pop();
+    if (history.length > 64) history.pop();
 
     renderHistory();
 
@@ -319,4 +319,5 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
