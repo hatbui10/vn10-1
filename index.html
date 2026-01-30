@@ -117,48 +117,62 @@ const result = document.getElementById("result");
 const historyView = document.getElementById("historyView");
 let buffer = [];
 let history = [];
-let serialCounter = 0;
-function renderHistory() {
-  historyView.innerHTML = "";
 
-  let basePos = null;
-  let matchCount = 0;
+let basePos = null;     // pos của lần trùng đầu tiên
+let matchCount = 0;    // số lần trùng đã dùng (tối đa 5)
+let serialCounter = 0; // STT
 
-  history.forEach(item => {
-    const stt = item.serialNumber;
-    let usePos = 0;
+  function addHistoryItem(pattern, pos) {
+  serialCounter++;
+  const stt = serialCounter;
 
-    if (item.pos > 0) {
+  let usePos = 0;
 
-      // nếu đã đủ 5 lần → reset
-      if (matchCount >= 5) {
-        basePos = null;
-        matchCount = 0;
-      }
+  if (pos > 0) {
 
-      // nếu chưa có mốc thì lấy mốc mới
-      if (basePos === null) {
-        basePos = item.pos;
-      }
-
-      usePos = basePos + stt;
-      matchCount++;
+    // nếu đã đủ 5 lần trùng → reset chu kỳ
+    if (matchCount >= 5) {
+      basePos = null;
+      matchCount = 0;
     }
 
-    const note = usePos > 0
-      ? ` → dùng ${item.pattern} tại vị trí số ${usePos}`
+    // nếu chưa có mốc → lấy pos của lần trùng đầu tiên
+    if (basePos === null) {
+      basePos = pos;
+    }
+
+    // tính vị trí sử dụng
+    usePos = basePos + stt;
+    matchCount++;
+  }
+
+  history.push({
+    serialNumber: stt,
+    pattern: pattern,
+    pos: pos,
+    usePos: usePos
+  });
+  }
+
+
+  function renderHistory() {
+  historyView.innerHTML = "";
+
+  history.forEach(item => {
+    const note = item.usePos > 0
+      ? ` → dùng ${item.pattern} tại vị trí số ${item.usePos}`
       : " → chưa trùng";
 
     const li = document.createElement("li");
     li.innerHTML = `
-      <strong>#${stt}</strong>
+      <strong>#${item.serialNumber}</strong>
       ${item.pattern}
       | pos=${item.pos}
       ${note}
     `;
     historyView.appendChild(li);
   });
-}
+  }
 
 
   
@@ -195,8 +209,7 @@ input6.disabled = true;
         inputs[i].classList.add("mark");
       }
     }
-    serialCounter++;
-    history.unshift({ pattern, pos, serialNumber: serialCounter });
+     
     if (history.length > 132) history.pop();
     renderHistory();
     setTimeout(resetCells, 350);
@@ -206,6 +219,7 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
 
