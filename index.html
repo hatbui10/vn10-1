@@ -146,11 +146,11 @@ let serialCounter = 0; // STT
     matchCount++;
   }
 
-  history.push({
-    serialNumber: stt,
-    pattern: pattern,
-    pos: pos,
-    usePos: usePos
+  history.unshift({
+  serialNumber: stt,
+  pattern,
+  pos,
+  usePos
   });
   }
 
@@ -223,7 +223,7 @@ if (!posLocked) {
      
     addHistoryItem(pattern, pos); // 🔥 DÒNG BỊ THIẾU
 
-if (history.length > 132) history.shift();
+if (history.length > 132) history.pop();
 renderHistory();
 setTimeout(resetCells, 350);
   
@@ -232,6 +232,7 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
 
