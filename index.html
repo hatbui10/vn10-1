@@ -117,7 +117,7 @@ const result = document.getElementById("result");
 const historyView = document.getElementById("historyView");
 let buffer = [];
 let history = [];
-
+let posLocked = false; // đã tính pos ở lần trùng thứ 2 hay chưa
 let basePos = null;     // pos của lần trùng đầu tiên
 let matchCount = 0;    // số lần trùng đã dùng (tối đa 5)
 let serialCounter = 0; // STT
@@ -196,13 +196,24 @@ input6.addEventListener("input", () => {
   if (buffer.length === 5) {
 input6.disabled = true;
     const pattern = buffer.join("");
+
+
+    
     let pos = 0;
-    for (let i = 0; i < Math.min(90, history.length); i++) {
-      if (history[i].pattern === pattern) {
-        pos = i + 1;
-        break;
-      }
+
+// CHỈ tìm pos nếu CHƯA khóa
+if (!posLocked) {
+  for (let i = 0; i < Math.min(90, history.length); i++) {
+    if (history[i].pattern === pattern) {
+      pos = i + 1;
+      posLocked = true; // khóa lại, từ lần sau không tính nữa
+      break;
     }
+  }
+}
+
+
+    
     result.textContent = pos;
     if (pos > 0) {
       for (let i = 0; i < 5; i++) {
@@ -219,6 +230,7 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
 
