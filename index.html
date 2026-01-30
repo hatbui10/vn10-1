@@ -164,7 +164,7 @@ function renderHistory() {
     // vị trí cần dùng = STT + item.pos (nếu pos = 0 thì coi như không cộng)
     const usePos = item.pos > 0 ? stt + item.pos : 0;
     const note = usePos > 0
-      ? ` → dùng tại vị trí số # ${usePos}`;
+       ` → dùng tại vị trí số # ${usePos}`;
 
     li.innerHTML = `
       <strong>#${stt}</strong>
@@ -229,4 +229,5 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
