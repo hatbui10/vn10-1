@@ -261,10 +261,10 @@ function renderHistory() {
     const li = document.createElement("li");
 
     const note = item.pos !== 0
-      ? " (bắt đầu tính từ vị trí số 0)"
+      ? " (hãy bắt đầu tại vị trí số )"
       : "";
 
-    li.textContent = `${item.pattern} : vị trí số ${item.pos}${note}`;
+    li.textContent = `${item.pattern} : vị trí số ${item.pos}${note}${item.pos kể từ vị trí này`;
     historyView.appendChild(li);
   });
 }
@@ -324,4 +324,5 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
