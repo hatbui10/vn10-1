@@ -257,14 +257,17 @@ let history = [];  // lịch sử đã kiểm tra
 
 function renderHistory() {
   historyView.innerHTML = "";
-  history.forEach(item => {
+  history.forEach((item, index) => {
     const li = document.createElement("li");
 
     const note = item.pos !== 0
       ? ` (Đây là vị trí số 0 hãy bắt đầu tại vị trí số ${item.pos})`
       : "";
 
-    li.textContent = `${item.pattern} : vị trí số ${item.pos}${note}`;
+    const serialNumber = index === 0 ? 1 : (parseInt(history[0].serialNumber || 1) + index);
+    item.serialNumber = serialNumber;
+    
+    li.innerHTML = `<span style="color: #667eea; font-weight: bold; font-size: 1.1rem;">#${serialNumber}</span> ${item.pattern} : vị trí số ${item.pos}${note}`;
     historyView.appendChild(li);
   });
 }
