@@ -121,7 +121,10 @@ let posLocked = false; // đã tính pos ở lần trùng thứ 2 hay chưa
 let basePos = null;     // pos của lần trùng đầu tiên
 let matchCount = 0;    // số lần trùng đã dùng (tối đa 5)
 let serialCounter = 0; // STT
+let duplicateCount = 0;
 
+
+  
   function addHistoryItem(pattern, pos) {
   serialCounter++;
   const stt = serialCounter;
@@ -204,15 +207,19 @@ input6.disabled = true;
     
     let pos = 0;
 
-// CHỈ tìm pos nếu CHƯA khóa
-if (!posLocked) {
-  for (let i = 0; i < Math.min(90, history.length); i++) {
-    if (history[i].pattern === pattern) {
-      pos = i + 1;
-      posLocked = true; // khóa lại, từ lần sau không tính nữa
-      break;
-    }
-  }
+// đếm xem pattern đã xuất hiện bao nhiêu lần
+const matches = history.filter(h => h.pattern === pattern);
+
+if (matches.length === 1) {
+  // 👉 đây là TRÙNG LẦN 2
+  basePos = history.findIndex(h => h.pattern === pattern) + 1;
+  duplicateCount = 2;
+  pos = basePos;
+} 
+else if (matches.length >= 2 && basePos !== null) {
+  // 👉 trùng lần 3 trở đi
+  duplicateCount++;
+  pos = basePos + serialCounter;
 }
   
 
@@ -235,6 +242,7 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
 
