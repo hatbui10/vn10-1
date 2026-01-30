@@ -154,17 +154,21 @@ const historyView = document.getElementById("historyView");
 let buffer = [];
 let history = [];
 let serialCounter = 0;
-
 function renderHistory() {
   historyView.innerHTML = "";
+
   history.forEach(item => {
     const li = document.createElement("li");
+
     // STT thực tế trong danh sách (bắt đầu từ 1)
     const stt = item.serialNumber;
+
     // vị trí cần dùng = STT + item.pos (nếu pos = 0 thì coi như không cộng)
     const usePos = item.pos > 0 ? stt + item.pos : 0;
+
     const note = usePos > 0
-       ` → dùng tại vị trí số # ${usePos}`;
+      ? ` → dùng tại vị trí số ${usePos}`
+      : ` → chưa trùng trong 10 dãy gần nhất`;
 
     li.innerHTML = `
       <strong>#${stt}</strong>
@@ -172,6 +176,7 @@ function renderHistory() {
       | pos=${item.pos}
       ${note}
     `;
+
     historyView.appendChild(li);
   });
 }
@@ -229,5 +234,6 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
