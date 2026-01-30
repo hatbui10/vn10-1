@@ -254,25 +254,27 @@ const historyView = document.getElementById("historyView");
 
 let buffer = [];   // chứa 5 số đang nhập
 let history = [];  // lịch sử đã kiểm tra
-
+let serialCounter = 0;
 function renderHistory() {
   historyView.innerHTML = "";
-  history.forEach((item, index) => {
+  history.forEach(item => {
     const li = document.createElement("li");
 
     const note = item.pos !== 0
-      ? ` (Đây là vị trí số 0 hãy bắt đầu tại vị trí số ${item.pos})`
+      ? ` (Đây là vị trí số 0, hãy bắt đầu tại vị trí số ${item.pos})`
       : "";
 
-    const serialNumber = index === 0 ? 1 : (parseInt(history[0].serialNumber || 1) + index);
-    item.serialNumber = serialNumber;
-    
-    li.innerHTML = `<span style="color: #667eea; font-weight: bold; font-size: 1.1rem;">#${serialNumber}</span> ${item.pattern} : vị trí số ${item.pos}${note}`;
+    li.innerHTML = `
+      <span style="color:#667eea;font-weight:bold;font-size:1.1rem;">
+        #${item.serialNumber}
+      </span>
+      ${item.pattern} : vị trí số ${item.pos}${note}
+    `;
+
     historyView.appendChild(li);
   });
 }
-
-function resetCells() {
+ction resetCells() {
   buffer = [];
   for (let i = 0; i < 5; i++) {
     inputs[i].value = "";
@@ -301,7 +303,6 @@ input6.addEventListener("input", () => {
         break;
       }
     }
-
     result.textContent = pos;
 
     if (pos > 0) {
@@ -310,8 +311,9 @@ input6.addEventListener("input", () => {
       }
     }
 
-    history.unshift({ pattern, pos });
-    if (history.length > 32) history.pop();
+    serialCounter++;
+history.unshift({ pattern, pos, serialNumber: serialCounter });
+  if (history.length > 32) history.pop();
 
     renderHistory();
 
@@ -327,6 +329,8 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
+
 
 
 
