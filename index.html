@@ -181,7 +181,7 @@ input6.addEventListener("input", () => {
     const pattern = buffer.join("");
 
     // tìm lần xuất hiện đầu tiên của pattern
-    const prev = history.find(h => h.pattern === pattern && h.pos !== 2);
+    const prev = history.find(h => h.pattern === pattern);
 
     let pos = 0;
     let usePos = 0;
@@ -230,6 +230,7 @@ window.onload = () => input6.focus();
 </script>
 </body>
 </html>
+
 
 
 
