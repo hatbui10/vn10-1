@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -110,55 +111,26 @@ input.mark {
   <h4>Lịch sử (tối đa 32 dãy)</h4>
   <ul id="historyView"></ul>
 </div>
+
+
+
+
+
+
 <script>
 const inputs = document.querySelectorAll("#cells input");
 const input6 = document.getElementById("input6");
 const result = document.getElementById("result");
 const historyView = document.getElementById("historyView");
+
 let buffer = [];
 let history = [];
-let posLocked = false; // đã tính pos ở lần trùng thứ 2 hay chưa
-let basePos = null;     // pos của lần trùng đầu tiên
-let matchCount = 0;    // số lần trùng đã dùng (tối đa 5)
-let serialCounter = 0; // STT
-let duplicateCount = 0;
+let serialCounter = 0;
 
-
-  
-  function addHistoryItem(pattern, pos) {
-  serialCounter++;
-  const stt = serialCounter;
-
-  let usePos = 0;
-
-  if (pos > 0) {
-
-    // nếu đã đủ 5 lần trùng → reset chu kỳ
-    if (matchCount >= 5) {
-      basePos = null;
-      matchCount = 0;
-    }
-
-    // nếu chưa có mốc → lấy pos của lần trùng đầu tiên
-    if (basePos === null) {
-      basePos = pos;
-    }
-
-    // tính vị trí sử dụng
-    usePos = basePos + stt;
-    matchCount++;
-  }
-
-  history.unshift({
-  serialNumber: stt,
-  pattern,
-  pos,
-  usePos
-  });
-  }
-
-
-  function renderHistory() {
+/* =========================
+   RENDER HISTORY (CHỈ HIỂN THỊ)
+========================= */
+function renderHistory() {
   historyView.innerHTML = "";
 
   history.forEach(item => {
@@ -175,81 +147,88 @@ let duplicateCount = 0;
     `;
     historyView.appendChild(li);
   });
-  }
+}
 
-
-  
+/* =========================
+   RESET INPUT
+========================= */
 function resetCells() {
   buffer = [];
   for (let i = 0; i < 5; i++) {
     inputs[i].value = "";
     inputs[i].classList.remove("mark");
   }
-input6.disabled = false;
-  input6.focus(); // cực kỳ quan trọng cho mobile
+  input6.disabled = false;
+  input6.focus();
 }
 
-
-  
+/* =========================
+   INPUT LOGIC
+========================= */
 input6.addEventListener("input", () => {
   const val = input6.value;
   input6.value = "";
+
   if (!/^[01]$/.test(val)) return;
   if (buffer.length >= 5) return;
 
   buffer.push(val);
   inputs[buffer.length - 1].value = val;
+
   if (buffer.length === 5) {
-input6.disabled = true;
+    input6.disabled = true;
+
     const pattern = buffer.join("");
 
-
-    
+    // tìm lần xuất hiện đầu tiên của pattern
+    const prev = history.find(h => h.pattern === pattern);
     let pos = 0;
+    let usePos = 0;
 
-// đếm xem pattern đã xuất hiện bao nhiêu lần
-const matches = history.filter(h => h.pattern === pattern);
+    serialCounter++;
+    const stt = serialCounter;
 
-if (matches.length === 1) {
-  // 👉 đây là TRÙNG LẦN 2
-  basePos = history.findIndex(h => h.pattern === pattern) + 1;
-  duplicateCount = 2;
-  pos = basePos;
-} 
-else if (matches.length >= 2 && basePos !== null) {
-  // 👉 trùng lần 3 trở đi
-  duplicateCount++;
-  pos = basePos + serialCounter;
+   if (prev) {
+  if (prev.pos === 0) {
+    // lần trùng đầu → CHỐT pos
+    pos = history.indexOf(prev) + 1;
+  } else {
+    // các lần trùng sau → dùng lại pos đã chốt
+    pos = prev.pos;
+  }
+  usePos = stt + pos;
 }
-  
 
-    
+    history.unshift({
+      serialNumber: stt,
+      pattern,
+      pos,
+      usePos
+    });
+
     result.textContent = pos;
+
     if (pos > 0) {
       for (let i = 0; i < 5; i++) {
         inputs[i].classList.add("mark");
       }
     }
-     
-    addHistoryItem(pattern, pos); // 🔥 DÒNG BỊ THIẾU
 
-if (history.length > 132) history.pop();
-renderHistory();
-setTimeout(resetCells, 350);
+    if (history.length > 132) history.pop();
+
+    renderHistory();
+    setTimeout(resetCells, 350);
   }
 });
+
+
+
+
+
 window.onload = () => input6.focus();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
