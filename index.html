@@ -163,6 +163,7 @@ function resetCells() {
 }
 
 /* =========================
+  /* =========================
    INPUT LOGIC
 ========================= */
 input6.addEventListener("input", () => {
@@ -180,24 +181,43 @@ input6.addEventListener("input", () => {
 
     const pattern = buffer.join("");
 
-    // tìm lần xuất hiện đầu tiên của pattern
-    const prev = history.find(h => h.pattern === pattern);
+    serialCounter++;
+    const stt = serialCounter;
 
     let pos = 0;
     let usePos = 0;
 
-    serialCounter++;
-    const stt = serialCounter;
+    // tìm prev hợp lệ (lọc luôn case cần bỏ)
+    const prev = history.find(h => {
+      if (h.pattern !== pattern) return false;
+
+      const isAdjacent = h.serialNumber === stt - 1;
+
+      // nếu STT liền trước + pos = 0 → KHÔNG cho sinh pos = 1
+      if (isAdjacent && h.pos === 0) {
+        return false;
+      }
+
+      return true;
+    });
 
    if (prev) {
   if (prev.pos === 0) {
-    // lần trùng đầu → CHỐT pos
-    pos = history.indexOf(prev) + 1;
+    const candidatePos = history.indexOf(prev) + 1;
+
+    // chỉ chấp nhận từ pos = 2 trở đi
+    if (candidatePos >= 2) {
+      pos = candidatePos;
+      usePos = stt + pos;
+    } else {
+      pos = 0;
+      usePos = 0;
+    }
   } else {
-    // các lần trùng sau → dùng lại pos đã chốt
+    // các lần sau dùng lại pos đã chốt
     pos = prev.pos;
+    usePos = stt + pos;
   }
-  usePos = stt + pos;
 }
 
     history.unshift({
@@ -209,7 +229,7 @@ input6.addEventListener("input", () => {
 
     result.textContent = pos;
 
-    if (pos > 0) {
+    if (pos >= 2) {
       for (let i = 0; i < 5; i++) {
         inputs[i].classList.add("mark");
       }
@@ -225,14 +245,10 @@ input6.addEventListener("input", () => {
 
 
 
-
 window.onload = () => input6.focus();
 </script>
 </body>
 </html>
-
-
-
 
 
 
