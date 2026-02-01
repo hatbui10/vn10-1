@@ -255,6 +255,42 @@
       color: var(--ink);
       white-space: pre-wrap;
       word-break: break-word;
+      margin-bottom: 0.75rem;
+    }
+
+    .entry-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .entry-actions .btn-entry {
+      font-family: 'Quicksand', sans-serif;
+      padding: 0.4rem 0.85rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-edit {
+      background: rgba(139, 115, 85, 0.15);
+      color: var(--accent);
+    }
+    .btn-edit:hover {
+      background: rgba(139, 115, 85, 0.25);
+    }
+
+    .btn-delete {
+      background: rgba(180, 80, 80, 0.12);
+      color: #a05555;
+    }
+    .btn-delete:hover {
+      background: rgba(180, 80, 80, 0.22);
     }
 
     .empty-state {
@@ -325,6 +361,7 @@
       <div class="actions">
         <button type="button" class="btn btn-primary" id="btn-save">Lưu nhật ký</button>
         <button type="button" class="btn btn-secondary" id="btn-clear">Xóa nội dung</button>
+        <span class="edit-hint" id="edit-hint" style="display: none; color: var(--accent); font-size: 0.9rem; align-self: center;">Đang chỉnh sửa — bấm "Cập nhật" để lưu thay đổi.</span>
       </div>
     </div>
 
@@ -352,6 +389,8 @@
       const today = new Date().toISOString().slice(0, 10);
       let selectedMood = '';
       let draftTimer = null;
+      let editingId = null;
+      let editingSortedIndex = null;
 
       // Khôi phục bản nháp khi mở trang (nếu có)
       function loadDraft() {
@@ -432,12 +471,64 @@
         }
         const sorted = entries.slice().sort((a, b) => new Date(b.savedAt || b.date) - new Date(a.savedAt || a.date));
         entriesList.innerHTML = sorted
-          .map((e, i) => `
-            <div class="entry-item${highlightFirst && i === 0 ? ' just-saved' : ''}">
+          .map((e, i) => {
+            const entryId = e.id || ('idx-' + i);
+            return `
+            <div class="entry-item${highlightFirst && i === 0 ? ' just-saved' : ''}" data-entry-id="${entryId}" data-sorted-index="${i}">
               <div class="entry-date">${e.mood ? e.mood + ' ' : ''}${formatDate(e.date)}${e.savedAt ? ' — Lúc ' + formatTime(e.savedAt) : ''}</div>
               <div class="entry-text">${escapeHtml(e.content)}</div>
+              <div class="entry-actions">
+                <button type="button" class="btn-entry btn-edit" data-action="edit" data-entry-id="${entryId}" data-sorted-index="${i}">Sửa</button>
+                <button type="button" class="btn-entry btn-delete" data-action="delete" data-entry-id="${entryId}" data-sorted-index="${i}">Xóa</button>
+              </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
+
+        // Gắn sự kiện xóa / sửa (delegation)
+        entriesList.querySelectorAll('.btn-entry').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.entryId;
+            const sortedIndex = parseInt(btn.dataset.sortedIndex, 10);
+            if (btn.dataset.action === 'delete') {
+              deleteEntry(id, sortedIndex);
+            } else {
+              editEntry(id, sortedIndex);
+            }
+          });
+        });
+      }
+
+      function deleteEntry(entryId, sortedIndex) {
+        if (!confirm('Bạn có chắc muốn xóa bài nhật ký này?')) return;
+        const entries = loadEntries();
+        const sorted = entries.slice().sort((a, b) => new Date(b.savedAt || b.date) - new Date(a.savedAt || a.date));
+        const toRemove = entryId.startsWith('idx-') ? sorted[sortedIndex] : entries.find(e => e.id === entryId);
+        if (!toRemove) return;
+        const newEntries = entries.filter(e => e !== toRemove);
+        saveEntries(newEntries);
+        renderEntries();
+        showToast();
+        document.getElementById('toast').textContent = 'Đã xóa bài nhật ký.';
+      }
+
+      function editEntry(entryId, sortedIndex) {
+        const entries = loadEntries();
+        const sorted = entries.slice().sort((a, b) => new Date(b.savedAt || b.date) - new Date(a.savedAt || a.date));
+        const entry = entryId.startsWith('idx-') ? sorted[sortedIndex] : entries.find(e => e.id === entryId);
+        if (!entry) return;
+        dateInput.value = entry.date;
+        contentInput.value = entry.content;
+        selectedMood = entry.mood || '';
+        moodBtns.forEach(b => {
+          b.classList.toggle('active', b.dataset.mood === entry.mood);
+        });
+        editingId = entryId;
+        editingSortedIndex = sortedIndex;
+        btnSave.textContent = 'Cập nhật';
+        document.getElementById('edit-hint').style.display = 'inline';
+        saveDraft();
+        document.querySelector('.diary-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function showToast() {
@@ -467,6 +558,13 @@
         return div.innerHTML.replace(/\n/g, '<br>');
       }
 
+      function exitEditMode() {
+        editingId = null;
+        editingSortedIndex = null;
+        btnSave.textContent = 'Lưu nhật ký';
+        document.getElementById('edit-hint').style.display = 'none';
+      }
+
       btnSave.addEventListener('click', () => {
         const content = contentInput.value.trim();
         if (!content) {
@@ -474,21 +572,47 @@
           return;
         }
         const entries = loadEntries();
-        entries.push({
-          date: dateInput.value,
-          content,
-          mood: selectedMood,
-          savedAt: new Date().toISOString() // Giờ lưu chính xác (lúc bấm "Lưu nhật ký")
-        });
-        saveEntries(entries);
-        renderEntries(true); // highlight bài vừa lưu
-        contentInput.value = '';
-        selectedMood = '';
-        moodBtns.forEach(b => b.classList.remove('active'));
-        clearDraft();
-        showToast();
-        // Cuộn xuống phần "Những dòng đã viết" để thấy bài vừa lưu
-        document.querySelector('.entries-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (editingId) {
+          // Đang chỉnh sửa: cập nhật bài có sẵn
+          const sorted = entries.slice().sort((a, b) => new Date(b.savedAt || b.date) - new Date(a.savedAt || a.date));
+          const toUpdate = editingId.startsWith('idx-') ? sorted[editingSortedIndex] : entries.find(e => e.id === editingId);
+          if (toUpdate) {
+            toUpdate.date = dateInput.value;
+            toUpdate.content = content;
+            toUpdate.mood = selectedMood;
+            toUpdate.savedAt = new Date().toISOString();
+            if (!toUpdate.id) toUpdate.id = 'id-' + Date.now();
+          }
+          saveEntries(entries);
+          renderEntries(true);
+          contentInput.value = '';
+          selectedMood = '';
+          moodBtns.forEach(b => b.classList.remove('active'));
+          clearDraft();
+          exitEditMode();
+          showToast();
+          document.getElementById('toast').textContent = 'Đã cập nhật bài nhật ký.';
+          document.querySelector('.entries-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          // Lưu bài mới
+          entries.push({
+            id: 'id-' + Date.now(),
+            date: dateInput.value,
+            content,
+            mood: selectedMood,
+            savedAt: new Date().toISOString()
+          });
+          saveEntries(entries);
+          renderEntries(true);
+          contentInput.value = '';
+          selectedMood = '';
+          moodBtns.forEach(b => b.classList.remove('active'));
+          clearDraft();
+          showToast();
+          document.getElementById('toast').textContent = 'Đã lưu! Xem trong "Những dòng đã viết" bên dưới.';
+          document.querySelector('.entries-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
 
       btnClear.addEventListener('click', () => {
@@ -496,6 +620,7 @@
         moodBtns.forEach(b => b.classList.remove('active'));
         selectedMood = '';
         clearDraft();
+        if (editingId) exitEditMode();
       });
 
       renderEntries();
