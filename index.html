@@ -148,30 +148,101 @@
       background: rgba(139, 115, 85, 0.1);
     }
 
-    textarea {
-      width: 100%;
-      min-height: 280px;
-      padding: 1.25rem;
+    .format-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 0.5rem 0;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .format-toolbar label {
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+
+    .format-toolbar .btn-format {
+      width: 36px;
+      height: 36px;
       border: 1px solid var(--border);
       border-radius: 6px;
       background: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: Georgia, serif;
+      color: var(--ink);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .format-toolbar .btn-format:hover {
+      background: rgba(139, 115, 85, 0.1);
+      border-color: var(--accent-light);
+    }
+
+    .format-toolbar .btn-format.active {
+      background: rgba(139, 115, 85, 0.2);
+      border-color: var(--accent);
+    }
+
+    .format-toolbar .btn-format.italic {
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    .format-toolbar select.format-select {
+      font-family: 'Quicksand', sans-serif;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .format-toolbar input[type="color"] {
+      width: 36px;
+      height: 36px;
+      padding: 2px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .editor-wrap {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .editor-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.12);
+    }
+
+    #entry-content {
+      width: 100%;
+      min-height: 280px;
+      padding: 1.25rem;
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.2rem;
       color: var(--ink);
-      resize: vertical;
-      transition: border-color 0.2s, box-shadow 0.2s;
       line-height: 1.8;
+      outline: none;
+      overflow-y: auto;
     }
 
-    textarea::placeholder {
+    #entry-content:empty::before {
+      content: attr(data-placeholder);
       color: #a09888;
       font-style: italic;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.12);
     }
 
     .actions {
@@ -357,7 +428,23 @@
         <button type="button" class="mood-btn" data-mood="❤️" title="Yêu đời">❤️</button>
         <button type="button" class="mood-btn" data-mood="✨" title="Tuyệt vời">✨</button>
       </div>
-      <textarea id="entry-content" placeholder="Hôm nay của bạn thế nào? Hãy viết ra những suy nghĩ, cảm xúc..."></textarea>
+      <div class="format-toolbar">
+        <button type="button" class="btn-format" id="fmt-bold" title="Đậm (Bold)"><b>B</b></button>
+        <button type="button" class="btn-format italic" id="fmt-italic" title="Nghiêng (Italic)"><i>I</i></button>
+        <label for="fmt-size">Cỡ chữ:</label>
+        <select id="fmt-size" class="format-select" title="Kích thước chữ">
+          <option value="14">Nhỏ (14px)</option>
+          <option value="16">Vừa (16px)</option>
+          <option value="18" selected>Bình thường (18px)</option>
+          <option value="20">Lớn (20px)</option>
+          <option value="24">Rất lớn (24px)</option>
+        </select>
+        <label for="fmt-color">Màu:</label>
+        <input type="color" id="fmt-color" value="#2c2416" title="Màu chữ">
+      </div>
+      <div class="editor-wrap">
+        <div id="entry-content" contenteditable="true" data-placeholder="Hôm nay của bạn thế nào? Hãy viết ra những suy nghĩ, cảm xúc..."></div>
+      </div>
       <div class="actions">
         <button type="button" class="btn btn-primary" id="btn-save">Lưu nhật ký</button>
         <button type="button" class="btn btn-secondary" id="btn-clear">Xóa nội dung</button>
@@ -392,6 +479,17 @@
       let editingId = null;
       let editingSortedIndex = null;
 
+      // Lấy / gán nội dung ô viết (contenteditable)
+      function getEditorContent() {
+        return contentInput.innerHTML;
+      }
+      function setEditorContent(html) {
+        contentInput.innerHTML = html || '';
+      }
+      function getEditorText() {
+        return contentInput.textContent || '';
+      }
+
       // Khôi phục bản nháp khi mở trang (nếu có)
       function loadDraft() {
         try {
@@ -402,7 +500,7 @@
           }
           const draft = JSON.parse(raw);
           if (draft.date) dateInput.value = draft.date;
-          if (draft.content) contentInput.value = draft.content;
+          if (draft.content) setEditorContent(draft.content);
           if (draft.mood) {
             selectedMood = draft.mood;
             moodBtns.forEach(b => {
@@ -420,7 +518,7 @@
       function saveDraft() {
         const draft = {
           date: dateInput.value,
-          content: contentInput.value,
+          content: getEditorContent(),
           mood: selectedMood
         };
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -451,6 +549,35 @@
       contentInput.addEventListener('input', scheduleDraftSave);
       contentInput.addEventListener('blur', saveDraft);
 
+      // Thanh định dạng: đậm, nghiêng, cỡ chữ, màu
+      document.getElementById('fmt-bold').addEventListener('click', () => {
+        contentInput.focus();
+        document.execCommand('bold', false, null);
+      });
+      document.getElementById('fmt-italic').addEventListener('click', () => {
+        contentInput.focus();
+        document.execCommand('italic', false, null);
+      });
+      document.getElementById('fmt-size').addEventListener('change', function() {
+        contentInput.focus();
+        const size = this.value + 'px';
+        const sel = window.getSelection();
+        const range = sel.rangeCount ? sel.getRangeAt(0) : null;
+        if (!range || !contentInput.contains(range.commonAncestorContainer) || range.collapsed) return;
+        const span = document.createElement('span');
+        span.style.fontSize = size;
+        try {
+          range.surroundContents(span);
+        } catch (e) {
+          span.appendChild(range.extractContents());
+          range.insertNode(span);
+        }
+      });
+      document.getElementById('fmt-color').addEventListener('input', function() {
+        contentInput.focus();
+        document.execCommand('foreColor', false, this.value);
+      });
+
       // Lưu bản nháp ngay khi sắp đóng/refresh trang
       window.addEventListener('beforeunload', saveDraft);
 
@@ -476,7 +603,7 @@
             return `
             <div class="entry-item${highlightFirst && i === 0 ? ' just-saved' : ''}" data-entry-id="${entryId}" data-sorted-index="${i}">
               <div class="entry-date">${e.mood ? e.mood + ' ' : ''}${formatDate(e.date)}${e.savedAt ? ' — Lúc ' + formatTime(e.savedAt) : ''}</div>
-              <div class="entry-text">${escapeHtml(e.content)}</div>
+              <div class="entry-text">${renderEntryContent(e.content)}</div>
               <div class="entry-actions">
                 <button type="button" class="btn-entry btn-edit" data-action="edit" data-entry-id="${entryId}" data-sorted-index="${i}">Sửa</button>
                 <button type="button" class="btn-entry btn-delete" data-action="delete" data-entry-id="${entryId}" data-sorted-index="${i}">Xóa</button>
@@ -518,7 +645,7 @@
         const entry = entryId.startsWith('idx-') ? sorted[sortedIndex] : entries.find(e => e.id === entryId);
         if (!entry) return;
         dateInput.value = entry.date;
-        contentInput.value = entry.content;
+        setEditorContent(entry.content);
         selectedMood = entry.mood || '';
         moodBtns.forEach(b => {
           b.classList.toggle('active', b.dataset.mood === entry.mood);
@@ -558,6 +685,24 @@
         return div.innerHTML.replace(/\n/g, '<br>');
       }
 
+      function sanitizeHtml(html) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        div.querySelectorAll('script, style, iframe, object, form').forEach(el => el.remove());
+        div.querySelectorAll('*').forEach(el => {
+          Array.from(el.attributes).forEach(attr => {
+            if (attr.name.startsWith('on') || attr.name === 'href' && (attr.value || '').toLowerCase().startsWith('javascript:')) el.removeAttribute(attr.name);
+          });
+        });
+        return div.innerHTML;
+      }
+
+      function renderEntryContent(content) {
+        if (!content) return '';
+        if (content.indexOf('<') !== -1) return sanitizeHtml(content);
+        return escapeHtml(content);
+      }
+
       function exitEditMode() {
         editingId = null;
         editingSortedIndex = null;
@@ -566,7 +711,7 @@
       }
 
       btnSave.addEventListener('click', () => {
-        const content = contentInput.value.trim();
+        const content = getEditorText().trim();
         if (!content) {
           alert('Hãy viết gì đó trước khi lưu nhé!');
           return;
@@ -579,14 +724,14 @@
           const toUpdate = editingId.startsWith('idx-') ? sorted[editingSortedIndex] : entries.find(e => e.id === editingId);
           if (toUpdate) {
             toUpdate.date = dateInput.value;
-            toUpdate.content = content;
+            toUpdate.content = getEditorContent();
             toUpdate.mood = selectedMood;
             toUpdate.savedAt = new Date().toISOString();
             if (!toUpdate.id) toUpdate.id = 'id-' + Date.now();
           }
           saveEntries(entries);
           renderEntries(true);
-          contentInput.value = '';
+          setEditorContent('');
           selectedMood = '';
           moodBtns.forEach(b => b.classList.remove('active'));
           clearDraft();
@@ -599,13 +744,13 @@
           entries.push({
             id: 'id-' + Date.now(),
             date: dateInput.value,
-            content,
+            content: getEditorContent(),
             mood: selectedMood,
             savedAt: new Date().toISOString()
           });
           saveEntries(entries);
           renderEntries(true);
-          contentInput.value = '';
+          setEditorContent('');
           selectedMood = '';
           moodBtns.forEach(b => b.classList.remove('active'));
           clearDraft();
@@ -616,7 +761,7 @@
       });
 
       btnClear.addEventListener('click', () => {
-        contentInput.value = '';
+        setEditorContent('');
         moodBtns.forEach(b => b.classList.remove('active'));
         selectedMood = '';
         clearDraft();
