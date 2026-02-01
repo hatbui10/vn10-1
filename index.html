@@ -1,257 +1,506 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>Binary Batch Checker</title>
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  color: #333;
-}
-.container {
-  background: rgba(255,255,255,0.95);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  max-width: 600px;
-  width: 100%;
-}
-h3, h4 {
-  text-align: center;
-  color: #4a5568;
-  margin-bottom: 20px;
-}
-.row {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 25px;
-}
-input {
-  width: 60px;
-  height: 60px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  border: 3px solid #e2e8f0;
-  border-radius: 15px;
-  background: #f7fafc;
-}
-input:focus {
-  outline: none;
-  border-color: #667eea;
-}
-input:disabled {
-  background: #edf2f7;
-  color: #94a3b8;
-}
-input.mark {
-  background: #ffc107;
-  border-color: #ffb300;
-}
-.result-section {
-  text-align: center;
-  padding: 15px;
-  background: #f8fafc;
-  border-radius: 15px;
-  margin-bottom: 25px;
-}
-#result {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #667eea;
-}
-#historyView {
-  list-style: none;
-  max-height: 300px;
-  overflow-y: auto;
-}
-#historyView li {
-  padding: 10px 14px;
-  margin-bottom: 8px;
-  background: #f7fafc;
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhật ký của tôi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5f0e8;
+      --ink: #2c2416;
+      --accent: #8b7355;
+      --accent-light: #c4a77d;
+      --shadow: rgba(44, 36, 22, 0.08);
+      --border: #e0d5c4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #e8e0d0 0%, #f0ebe0 50%, #e5ddd0 100%);
+      min-height: 100vh;
+      color: var(--ink);
+      padding: 2rem 1rem;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: 500;
+      letter-spacing: 0.2em;
+    }
+
+    .diary-card {
+      background: var(--paper);
+      border-radius: 4px;
+      box-shadow: 
+        0 4px 20px var(--shadow),
+        0 0 1px var(--border);
+      padding: 2rem 2.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diary-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--accent-light), var(--accent));
+      border-radius: 4px 0 0 4px;
+    }
+
+    .date-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .date-row label {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .date-row input[type="date"] {
+      font-family: 'Quicksand', sans-serif;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .date-row input[type="date"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.15);
+    }
+
+    .mood-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .mood-row span {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+
+    .mood-btn {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .mood-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--accent-light);
+    }
+
+    .mood-btn.active {
+      border-color: var(--accent);
+      background: rgba(139, 115, 85, 0.1);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 280px;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: var(--ink);
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.8;
+    }
+
+    textarea::placeholder {
+      color: #a09888;
+      font-style: italic;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Quicksand', sans-serif;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #6b5a45);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(139, 115, 85, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(139, 115, 85, 0.35);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 2px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-light);
+      background: rgba(196, 167, 125, 0.08);
+    }
+
+    .entries-section {
+      margin-top: 3rem;
+    }
+
+    .entries-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .entry-item {
+      background: var(--paper);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 12px var(--shadow);
+      border-left: 4px solid var(--accent-light);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .entry-date {
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .entry-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #a09888;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--accent);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(139, 115, 85, 0.4);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 1000;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .entry-item.just-saved {
+      animation: highlight 1.5s ease;
+    }
+    @keyframes highlight {
+      0% { background: rgba(196, 167, 125, 0.35); }
+      100% { background: var(--paper); }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h3>Nhập 0 / 1 tại ô cuối (đủ 5 sẽ tự kiểm tra & reset)</h3>
-  <div class="row" id="cells">
-    <input disabled>
-    <input disabled>
-    <input disabled>
-    <input disabled>
-    <input disabled>
-    <input
-      id="input6"
-      type="tel"
-      inputmode="numeric"
-      pattern="[01]"
-      maxlength="1"
-    >
+  <div class="container">
+    <header>
+      <h1>Nhật ký của tôi</h1>
+      <p class="subtitle">Ghi lại từng ngày</p>
+    </header>
+
+    <div class="diary-card">
+      <div class="date-row">
+        <label for="entry-date">Ngày</label>
+        <input type="date" id="entry-date">
+      </div>
+      <div class="mood-row">
+        <span>Tâm trạng:</span>
+        <button type="button" class="mood-btn" data-mood="😊" title="Vui">😊</button>
+        <button type="button" class="mood-btn" data-mood="😌" title="Bình yên">😌</button>
+        <button type="button" class="mood-btn" data-mood="🤔" title="Suy ngẫm">🤔</button>
+        <button type="button" class="mood-btn" data-mood="😢" title="Buồn">😢</button>
+        <button type="button" class="mood-btn" data-mood="❤️" title="Yêu đời">❤️</button>
+        <button type="button" class="mood-btn" data-mood="✨" title="Tuyệt vời">✨</button>
+      </div>
+      <textarea id="entry-content" placeholder="Hôm nay của bạn thế nào? Hãy viết ra những suy nghĩ, cảm xúc..."></textarea>
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btn-save">Lưu nhật ký</button>
+        <button type="button" class="btn btn-secondary" id="btn-clear">Xóa nội dung</button>
+      </div>
+    </div>
+
+    <section class="entries-section">
+      <h2>Những dòng đã viết</h2>
+      <div id="entries-list">
+        <p class="empty-state">Chưa có bài nào. Hãy viết dòng đầu tiên!</p>
+      </div>
+    </section>
+
+    <footer>Viết mỗi ngày — Nuôi dưỡng thói quen tốt</footer>
+    <div class="toast" id="toast" aria-live="polite">Đã lưu! Xem trong "Những dòng đã viết" bên dưới.</div>
   </div>
-  <div class="result-section">
-    <p>Kết quả so trùng (0 = không trùng trong 10 lần):</p>
-    <div id="result">-</div>
-  </div>
-  <h4>Lịch sử (tối đa 32 dãy)</h4>
-  <ul id="historyView"></ul>
-</div>
 
+  <script>
+    (function() {
+      const dateInput = document.getElementById('entry-date');
+      const contentInput = document.getElementById('entry-content');
+      const btnSave = document.getElementById('btn-save');
+      const btnClear = document.getElementById('btn-clear');
+      const entriesList = document.getElementById('entries-list');
+      const moodBtns = document.querySelectorAll('.mood-btn');
 
+      const DRAFT_KEY = 'diaryDraft';
+      const today = new Date().toISOString().slice(0, 10);
+      let selectedMood = '';
+      let draftTimer = null;
 
-
-
-
-<script>
-const inputs = document.querySelectorAll("#cells input");
-const input6 = document.getElementById("input6");
-const result = document.getElementById("result");
-const historyView = document.getElementById("historyView");
-
-let buffer = [];
-let history = [];
-let serialCounter = 0;
-
-/* =========================
-   RENDER HISTORY (CHỈ HIỂN THỊ)
-========================= */
-function renderHistory() {
-  historyView.innerHTML = "";
-
-  history.forEach(item => {
-    const note = item.usePos > 0
-      ? ` → dùng ${item.pattern} tại vị trí số ${item.usePos}`
-      : " → chưa trùng";
-
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>#${item.serialNumber}</strong>
-      ${item.pattern}
-      | pos=${item.pos}
-      ${note}
-    `;
-    historyView.appendChild(li);
-  });
-}
-
-/* =========================
-   RESET INPUT
-========================= */
-function resetCells() {
-  buffer = [];
-  for (let i = 0; i < 5; i++) {
-    inputs[i].value = "";
-    inputs[i].classList.remove("mark");
-  }
-  input6.disabled = false;
-  input6.focus();
-}
-
-/* =========================
-  /* =========================
-   INPUT LOGIC
-========================= */
-input6.addEventListener("input", () => {
-  const val = input6.value;
-  input6.value = "";
-
-  if (!/^[01]$/.test(val)) return;
-  if (buffer.length >= 5) return;
-
-  buffer.push(val);
-  inputs[buffer.length - 1].value = val;
-
-  if (buffer.length === 5) {
-    input6.disabled = true;
-
-    const pattern = buffer.join("");
-
-    serialCounter++;
-    const stt = serialCounter;
-
-    let pos = 0;
-    let usePos = 0;
-
-    // tìm prev hợp lệ (lọc luôn case cần bỏ)
-    const prev = history.find(h => {
-      if (h.pattern !== pattern) return false;
-
-      const isAdjacent = h.serialNumber === stt - 1;
-
-      // nếu STT liền trước + pos = 0 → KHÔNG cho sinh pos = 1
-      if (isAdjacent && h.pos === 0) {
-        return false;
+      // Khôi phục bản nháp khi mở trang (nếu có)
+      function loadDraft() {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) {
+            dateInput.value = today;
+            return;
+          }
+          const draft = JSON.parse(raw);
+          if (draft.date) dateInput.value = draft.date;
+          if (draft.content) contentInput.value = draft.content;
+          if (draft.mood) {
+            selectedMood = draft.mood;
+            moodBtns.forEach(b => {
+              b.classList.toggle('active', b.dataset.mood === draft.mood);
+            });
+          } else {
+            dateInput.value = dateInput.value || today;
+          }
+        } catch (e) {
+          dateInput.value = today;
+        }
       }
 
-      return true;
-    });
-
-   if (prev) {
-  if (prev.pos === 0) {
-    const candidatePos = history.indexOf(prev) + 1;
-
-    // chỉ chấp nhận từ pos = 2 trở đi
-    if (candidatePos >= 2) {
-      pos = candidatePos;
-      usePos = stt + pos;
-    } else {
-      pos = 0;
-      usePos = 0;
-    }
-  } else {
-    // các lần sau dùng lại pos đã chốt
-    pos = prev.pos;
-    usePos = stt + pos;
-  }
-}
-
-    history.unshift({
-      serialNumber: stt,
-      pattern,
-      pos,
-      usePos
-    });
-
-    result.textContent = pos;
-
-    if (pos >= 2) {
-      for (let i = 0; i < 5; i++) {
-        inputs[i].classList.add("mark");
+      // Tự động lưu bản nháp (tránh mất khi tải lại trang)
+      function saveDraft() {
+        const draft = {
+          date: dateInput.value,
+          content: contentInput.value,
+          mood: selectedMood
+        };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
       }
-    }
 
-    if (history.length > 250) history.pop();
+      function clearDraft() {
+        localStorage.removeItem(DRAFT_KEY);
+      }
 
-    renderHistory();
-    setTimeout(resetCells, 350);
-  }
-});
+      // Lưu bản nháp sau khi user ngừng gõ vài giây
+      function scheduleDraftSave() {
+        if (draftTimer) clearTimeout(draftTimer);
+        draftTimer = setTimeout(saveDraft, 800);
+      }
 
+      loadDraft();
 
+      moodBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          moodBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedMood = btn.dataset.mood;
+          saveDraft();
+        });
+      });
 
+      dateInput.addEventListener('change', saveDraft);
+      contentInput.addEventListener('input', scheduleDraftSave);
+      contentInput.addEventListener('blur', saveDraft);
 
-window.onload = () => input6.focus();
-</script>
+      // Lưu bản nháp ngay khi sắp đóng/refresh trang
+      window.addEventListener('beforeunload', saveDraft);
+
+      function loadEntries() {
+        const data = localStorage.getItem('diaryEntries');
+        return data ? JSON.parse(data) : [];
+      }
+
+      function saveEntries(entries) {
+        localStorage.setItem('diaryEntries', JSON.stringify(entries));
+      }
+
+      function renderEntries(highlightFirst) {
+        const entries = loadEntries();
+        if (entries.length === 0) {
+          entriesList.innerHTML = '<p class="empty-state">Chưa có bài nào. Hãy viết dòng đầu tiên!</p>';
+          return;
+        }
+        const sorted = entries.slice().sort((a, b) => new Date(b.savedAt || b.date) - new Date(a.savedAt || a.date));
+        entriesList.innerHTML = sorted
+          .map((e, i) => `
+            <div class="entry-item${highlightFirst && i === 0 ? ' just-saved' : ''}">
+              <div class="entry-date">${e.mood ? e.mood + ' ' : ''}${formatDate(e.date)}${e.savedAt ? ' — Lúc ' + formatTime(e.savedAt) : ''}</div>
+              <div class="entry-text">${escapeHtml(e.content)}</div>
+            </div>
+          `).join('');
+      }
+
+      function showToast() {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+
+      function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('vi-VN', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      }
+
+      function formatTime(isoStr) {
+        const d = new Date(isoStr);
+        return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML.replace(/\n/g, '<br>');
+      }
+
+      btnSave.addEventListener('click', () => {
+        const content = contentInput.value.trim();
+        if (!content) {
+          alert('Hãy viết gì đó trước khi lưu nhé!');
+          return;
+        }
+        const entries = loadEntries();
+        entries.push({
+          date: dateInput.value,
+          content,
+          mood: selectedMood,
+          savedAt: new Date().toISOString() // Giờ lưu chính xác (lúc bấm "Lưu nhật ký")
+        });
+        saveEntries(entries);
+        renderEntries(true); // highlight bài vừa lưu
+        contentInput.value = '';
+        selectedMood = '';
+        moodBtns.forEach(b => b.classList.remove('active'));
+        clearDraft();
+        showToast();
+        // Cuộn xuống phần "Những dòng đã viết" để thấy bài vừa lưu
+        document.querySelector('.entries-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      btnClear.addEventListener('click', () => {
+        contentInput.value = '';
+        moodBtns.forEach(b => b.classList.remove('active'));
+        selectedMood = '';
+        clearDraft();
+      });
+
+      renderEntries();
+    })();
+  </script>
 </body>
 </html>
-
-
-
-
-
 
